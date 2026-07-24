@@ -5,24 +5,42 @@ interface BodyMapProps {
   onRegionSelect: (region: BodySystem) => void;
   selectedRegion?: BodySystem | null;
   loggedCounts?: Record<string, number>;
+  recentSeverityByRegion?: Record<string, { severity: number; occurredAt: string }>;
 }
 
 /**
  * Visual region state:
  *  selected  → indigo-500 fill, indigo-600 stroke
- *  has logs  → indigo-100 fill, indigo-300 stroke (shows historical activity at rest)
+ *  has logs  → color-coded by most recent severity:
+ *               low (1-3): amber, medium (4-6): orange, high (7-10): red
  *  default   → slate-50 fill, slate-200 stroke (always visible, not relying on hover alone)
  */
-export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {} }: BodyMapProps) {
+export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, recentSeverityByRegion = {} }: BodyMapProps) {
   const [view, setView] = useState<'front' | 'back'>('front');
+
+  const getSeverityColor = (severity: number): { fill: string; stroke: string } => {
+    if (severity <= 3) return { fill: '#fef3c7', stroke: '#f59e0b' };
+    if (severity <= 6) return { fill: '#ffedd5', stroke: '#f97316' };
+    return { fill: '#fee2e2', stroke: '#ef4444' };
+  };
+
+  const regionsInView = view === 'front'
+    ? (['head', 'chest', 'abdomen', 'left-arm', 'right-arm', 'left-leg', 'right-leg'] as BodySystem[])
+    : (['head', 'back', 'left-arm', 'right-arm', 'left-leg', 'right-leg'] as BodySystem[]);
 
   const getRegionProps = (region: BodySystem) => {
     const isActive = selectedRegion === region;
     const hasLogs = (loggedCounts[region] || 0) > 0;
     const count = loggedCounts[region] || 0;
+    const recent = recentSeverityByRegion[region];
 
     let fill: string, stroke: string;
     if (isActive)    { fill = '#6366f1'; stroke = '#4f46e5'; }
+    else if (hasLogs && recent) {
+      const sevColor = getSeverityColor(recent.severity);
+      fill = sevColor.fill;
+      stroke = sevColor.stroke;
+    }
     else if (hasLogs){ fill = '#e0e7ff'; stroke = '#a5b4fc'; }
     else             { fill = '#f8fafc'; stroke = '#cbd5e1'; }
 
@@ -59,12 +77,10 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {} }: B
       </p>
 
       {/* SVG body map — inline fills so resting-state borders always appear in recordings */}
-      <div className="relative">
+      <div className="relative w-full max-w-[220px] mx-auto">
         <svg
-          width="220"
-          height="460"
           viewBox="0 0 240 480"
-          className="overflow-visible"
+          className="w-full h-auto overflow-visible"
           aria-label="Body map"
           role="img"
         >
@@ -103,7 +119,7 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {} }: B
 
           {/* ── Log count badges ─────────────────────────────────────────── */}
           {Object.entries(loggedCounts).map(([region, count]) => {
-            if (!count) return null;
+            if (!count || !regionsInView.includes(region as BodySystem)) return null;
             const pos: Record<string, [number, number]> = {
               head: [120, 50], chest: [120, 138], abdomen: [120, 220],
               back: [120, 178], 'right-arm': [57, 168], 'left-arm': [183, 168],
@@ -124,14 +140,22 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {} }: B
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 mt-5 text-[11px] text-slate-400 font-medium">
+      <div className="flex flex-wrap items-center gap-4 mt-5 text-[11px] text-slate-400 font-medium">
         <span className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-sm bg-slate-50 border border-slate-300 inline-block" />
           No logs
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm bg-indigo-100 border border-indigo-300 inline-block" />
-          Has logs
+          <span className="w-3 h-3 rounded-sm bg-amber-100 border border-amber-400 inline-block" />
+          Low (1–3)
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-sm bg-orange-100 border border-orange-400 inline-block" />
+          Medium (4–6)
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-sm bg-red-100 border border-red-400 inline-block" />
+          High (7–10)
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-sm bg-indigo-500 border border-indigo-600 inline-block" />

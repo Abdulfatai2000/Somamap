@@ -55,13 +55,7 @@ function InsightCard({ icon, label, copy, accent, emptyMsg }: InsightCardProps) 
  * PatternPanel
  *
  * Renders pattern insights derived from the provided events array.
- * Currently wired to MOCK_EVENTS from @/test/mockFixture.
- *
- * ══════════════════════════════════════════════════════════════
- *  ⚡ SWAP POINT — see src/app/page.tsx where <PatternPanel>
- *  receives its `events` prop. Replace the mock fixture import
- *  there with real twin.events.list() output.
- * ══════════════════════════════════════════════════════════════
+ * Receives real twin events from src/app/page.tsx via the `events` prop.
  */
 export function PatternPanel({ events }: PatternPanelProps) {
   const mostLogged = describeMostLoggedRegion(events);

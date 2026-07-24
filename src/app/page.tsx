@@ -18,7 +18,8 @@ export default function Home() {
       const res = await fetch('/api/twin');
       const data = await res.json();
       if (res.ok && Array.isArray(data.events)) {
-        setEvents(data.events);
+        const symptoms = data.events.filter((e: any) => e.eventType === 'symptom');
+        setEvents(symptoms);
       }
     } catch (err) {
       console.error('Failed to fetch twin events:', err);
@@ -51,6 +52,19 @@ export default function Home() {
     return acc;
   }, {} as Record<string, number>);
 
+  // Compute most recent severity per region for color coding
+  const recentSeverityByRegion = events.reduce((acc, evt) => {
+    const sys = evt.data?.system;
+    const sev = evt.data?.severity;
+    if (sys && typeof sev === 'number') {
+      const existing = acc[sys];
+      if (!existing || new Date(evt.occurredAt).getTime() > new Date(existing.occurredAt).getTime()) {
+        acc[sys] = { severity: sev, occurredAt: evt.occurredAt };
+      }
+    }
+    return acc;
+  }, {} as Record<string, { severity: number; occurredAt: string }>);
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100">
       {/* Header */}
@@ -68,11 +82,8 @@ export default function Home() {
               Somamap
             </h1>
           </div>
-          <div className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
-            Phase 5.5 UI
           </div>
-        </div>
-      </header>
+        </header>
 
       <div className="max-w-5xl mx-auto px-6 py-12">
         <div className="text-center mb-10 space-y-3">
@@ -92,6 +103,7 @@ export default function Home() {
               onRegionSelect={handleRegionSelect}
               selectedRegion={selectedRegion}
               loggedCounts={loggedCounts}
+              recentSeverityByRegion={recentSeverityByRegion}
             />
           </div>
 

@@ -2,25 +2,10 @@
  * src/test/mockFixture.ts
  *
  * Hardcoded fixture of 10 fake SymptomEvent entries spanning multiple
- * body regions and dates. Used to demo the PatternPanel before real data
- * is available.
+ * body regions and dates. Available for Storybook / unit tests.
  *
- * ══════════════════════════════════════════════════════════════
- *  ⚡ SWAP POINT — replace mock data with real twin events here
- * ══════════════════════════════════════════════════════════════
- *
- * In src/components/PatternPanel.tsx, find the line:
- *
- *     import { MOCK_EVENTS } from '@/test/mockFixture';
- *
- * and replace the data source fed into the pattern functions with the
- * result of a real API call, e.g.:
- *
- *     const events = await twin.events.list({ limit: 200 });
- *
- * You can keep this fixture file for Storybook / unit tests even after
- * the swap.
- * ══════════════════════════════════════════════════════════════
+ * Note: The main app (src/app/page.tsx) feeds real twin events into
+ * PatternPanel; this fixture is not used in the live flow.
  */
 
 import type { SymptomEvent } from '@/lib/types';

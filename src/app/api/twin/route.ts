@@ -24,14 +24,16 @@ export async function GET() {
     // Fetch up to 10 events to verify connectivity and inspect the response shape
     const events = await twin.events.list({ limit: 10 });
 
+    const symptomEvents = events.filter((e: any) => e.eventType === 'symptom');
+
     return NextResponse.json({
       success: true,
       twinId: twin.id,
       grantId: twin.grant.grantId,
       grantedSystems: twin.grant.systems,     // null = all systems
       grantedEventTypes: twin.grant.eventTypes, // null = all types
-      eventsCount: events.length,
-      events,
+      eventsCount: symptomEvents.length,
+      events: symptomEvents,
     });
   } catch (error: any) {
     console.error('[twin/GET] Connection error:', error.message || error);

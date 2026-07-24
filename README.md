@@ -62,7 +62,7 @@ npm install
 Create `.env.local` in the project root (`Somamap/Somamap/`) with:
 
 ```env
-# DTP API key (dtp_... or holon_... from your developer dashboard)
+# DTP API key (dtp_... from your developer dashboard)
 DTP_API_KEY=your_api_key_here
 
 # Sandbox grant token — grab one from Dashboard → Sandbox → Grant Token
@@ -75,7 +75,15 @@ HOLON_API_URL=https://holon.ontomorph.com
 
 > **Sandbox host:** The DTP client is pre-configured with `baseUrl: https://sandbox-api.ontomorph.com`. Synthetic sandbox twins live on a separate host from production twins.
 
-### 3. Start the dev server
+### 3. Seed demo data (optional)
+
+Populate your sandbox twin with ~2 weeks of realistic demo events across multiple body regions:
+
+```bash
+npx tsx scripts/seed-demo.ts
+```
+
+### 4. Start the dev server
 
 ```bash
 npm run dev
@@ -83,7 +91,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-### 4. Try it
+### 5. Try it
 
 1. Tap any region on the body diagram (chest, head, abdomen, etc.)
 2. Type a symptom name — clinical suggestions appear after ~350ms
@@ -112,6 +120,9 @@ src/
     ├── types.ts              # SymptomEvent, HolonConcept types
     ├── patterns.ts           # Pure pattern analysis functions
     └── constants.ts          # BODY_SYSTEMS enum
+
+scripts/
+└── seed-demo.ts              # One-time seed script for demo data
 ```
 
 ---
@@ -122,3 +133,4 @@ src/
 - **HOLON fallback** — if `HOLON_API_KEY` is not set, the HOLON route returns a local mock keyword database so the suggestion UI is always functional for demo purposes.
 - **Sandbox eventType** — the sandbox write endpoint accepts a specific enum. Somamap uses `"symptom"` (confirmed valid; full enum documented in `src/app/api/twin/route.ts`).
 - **Grant token rotation** — sandbox grant tokens should be rotated before each demo session since they are long-lived credentials.
+- **Built for OAU Hackathon** — this project was built solo within a compressed timeline to demonstrate real-time symptom logging on the Ontomorph Digital Twin Platform.

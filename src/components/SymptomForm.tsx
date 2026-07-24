@@ -11,6 +11,7 @@ interface SymptomFormProps {
 
 export function SymptomForm({ region, onClose }: SymptomFormProps) {
   const [name, setName] = useState('');
+  const [symptomType, setSymptomType] = useState('pain');
   const [severity, setSeverity] = useState<number>(5);
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,6 +23,7 @@ export function SymptomForm({ region, onClose }: SymptomFormProps) {
   const [acceptedConcept, setAcceptedConcept] = useState<HolonConcept | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const justAcceptedRef = useRef(false);
 
   // Debounced HOLON search — fires 350ms after the user stops typing
   const fetchSuggestions = useCallback(async (query: string) => {
@@ -34,8 +36,10 @@ export function SymptomForm({ region, onClose }: SymptomFormProps) {
     try {
       const res = await fetch(`/api/holon?q=${encodeURIComponent(query)}`);
       const data = await res.json();
-      setSuggestions(data.hits ?? []);
-      setShowSuggestions((data.hits ?? []).length > 0);
+      const rawHits = data.hits ?? [];
+      const cleanHits = rawHits.filter((h: any) => h.term && !h.term.toLowerCase().includes('unspecified'));
+      setSuggestions(cleanHits);
+      setShowSuggestions(cleanHits.length > 0);
     } catch {
       setSuggestions([]);
     } finally {
@@ -60,6 +64,8 @@ export function SymptomForm({ region, onClose }: SymptomFormProps) {
     setName(concept.term);
     setSuggestions([]);
     setShowSuggestions(false);
+    justAcceptedRef.current = true;
+    setTimeout(() => { justAcceptedRef.current = false; }, 400);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,6 +82,7 @@ export function SymptomForm({ region, onClose }: SymptomFormProps) {
         system: region,
         severity,
         symptomName: name,
+        symptomType,
         // HOLON-resolved fields — only present if user accepted a suggestion
         ...(acceptedConcept && {
           resolvedConceptId: acceptedConcept.conceptId,
@@ -125,21 +132,41 @@ export function SymptomForm({ region, onClose }: SymptomFormProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* ── Symptom Type ───────────────────────────────────────────── */}
+          <div className="space-y-2">
+            <label htmlFor="sym-type" className="block text-sm font-medium text-slate-700">
+              Symptom Type
+            </label>
+            <select
+              id="sym-type"
+              value={symptomType}
+              onChange={(e) => setSymptomType(e.target.value)}
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+            >
+              <option value="pain">Pain</option>
+              <option value="itch">Itch</option>
+              <option value="swelling">Swelling</option>
+              <option value="numbness">Numbness</option>
+              <option value="stiffness">Stiffness</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
           {/* ── Symptom Name + HOLON suggestions ─────────────────────── */}
           <div className="space-y-2">
             <label htmlFor="sym-name" className="block text-sm font-medium text-slate-700">
-              Symptom Name
+              Symptom Name {symptomType === 'other' ? '' : <span className="text-slate-400 font-normal">(Optional)</span>}
             </label>
             <div className="relative">
               <input
                 id="sym-name"
                 type="text"
-                required
+                required={symptomType === 'other'}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                placeholder="e.g. Sharp pain, Aching..."
+                placeholder={symptomType === 'other' ? 'Describe your symptom...' : 'Optional detail (e.g. sharp, dull, throbbing)...'}
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                 autoComplete="off"
               />

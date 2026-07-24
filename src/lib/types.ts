@@ -14,6 +14,7 @@ export interface SymptomEvent {
     system: string;         // body region e.g. "chest", "head"
     severity: number;       // 1–10
     symptomName: string;    // raw user-typed name
+    symptomType: string;    // Pain, Itch, Swelling, Numbness, Stiffness, Other
     // HOLON-resolved fields (optional — only present if user accepted suggestion)
     resolvedConceptId?: string;
     resolvedTerm?: string;

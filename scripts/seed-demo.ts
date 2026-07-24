@@ -1,0 +1,149 @@
+/**
+ * scripts/seed-demo.ts
+ *
+ * Seeds the connected sandbox twin with realistic demo symptom events
+ * spanning ~2 weeks across multiple body regions. Run once before demo:
+ *
+ *   npx tsx scripts/seed-demo.ts
+ *
+ * Or with a specific grant token:
+ *
+ *   SANDBOX_GRANT_TOKEN=eyJ... npx tsx scripts/seed-demo.ts
+ */
+
+import { DTP } from '@ontomorph/dtp-sdk';
+
+const GRANT_TOKEN = process.env.SANDBOX_GRANT_TOKEN;
+const DTP_API_KEY = process.env.DTP_API_KEY;
+const BASE_URL = process.env.DTP_BASE_URL ?? 'https://sandbox-api.ontomorph.com';
+
+if (!GRANT_TOKEN) {
+  console.error('SANDBOX_GRANT_TOKEN is required. Set it in .env.local or pass it inline.');
+  process.exit(1);
+}
+
+if (!DTP_API_KEY) {
+  console.error('DTP_API_KEY is required. Set it in .env.local or pass it inline.');
+  process.exit(1);
+}
+
+const dtp = new DTP({ apiKey: DTP_API_KEY, baseUrl: BASE_URL });
+
+function daysAgo(n: number, hour = 10): string {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  d.setHours(hour, 0, 0, 0);
+  return d.toISOString();
+}
+
+const DEMO_EVENTS = [
+  // ── chest (4 entries — most-logged region) ───────────────────────────────
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(13),
+    title: 'Tight chest after coffee',
+    description: 'Noticeable after second espresso. Lasted ~20 min.',
+    data: { system: 'chest', severity: 5, symptomName: 'Tight chest', resolvedConceptId: '23924001', resolvedTerm: 'Tight chest (finding)' },
+  },
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(10),
+    title: 'Chest discomfort',
+    description: 'Dull ache, worse when breathing deep.',
+    data: { system: 'chest', severity: 4, symptomName: 'Chest discomfort', resolvedConceptId: '29857009', resolvedTerm: 'Chest pain (finding)' },
+  },
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(6),
+    title: 'Sharp chest pain',
+    description: 'Sudden sharp pain on left side, gone within minutes.',
+    data: { system: 'chest', severity: 7, symptomName: 'Sharp chest pain' },
+  },
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(1),
+    title: 'Chest pressure',
+    description: 'Heavy feeling, especially when climbing stairs.',
+    data: { system: 'chest', severity: 6, symptomName: 'Chest pressure' },
+  },
+
+  // ── head (3 entries) ─────────────────────────────────────────────────────
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(12),
+    title: 'Tension headache',
+    description: 'Band-like pressure around forehead. Started in afternoon.',
+    data: { system: 'head', severity: 4, symptomName: 'Tension headache', resolvedConceptId: '25064002', resolvedTerm: 'Headache (finding)' },
+  },
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(8),
+    title: 'Migraine aura',
+    description: 'Flickering lights in peripheral vision, followed by throbbing pain.',
+    data: { system: 'head', severity: 8, symptomName: 'Migraine aura', resolvedConceptId: '37796009', resolvedTerm: 'Migraine (disorder)' },
+  },
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(3),
+    title: 'Throbbing headache',
+    description: 'One-sided, sensitive to light.',
+    data: { system: 'head', severity: 6, symptomName: 'Throbbing headache' },
+  },
+
+  // ── left-arm (2 entries) ─────────────────────────────────────────────────
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(9),
+    title: 'Left forearm cramp',
+    description: 'After long typing session. Muscle felt knotted.',
+    data: { system: 'left-arm', severity: 3, symptomName: 'Forearm cramp', resolvedConceptId: '55300003', resolvedTerm: 'Muscle cramp (finding)' },
+  },
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(4),
+    title: 'Left wrist ache',
+    description: 'Dull ache, worse with rotation.',
+    data: { system: 'left-arm', severity: 2, symptomName: 'Wrist ache' },
+  },
+
+  // ── right-leg (2 entries) ────────────────────────────────────────────────
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(11),
+    title: 'Right calf tightness',
+    description: 'After 5k run. Felt tight for 2 days.',
+    data: { system: 'right-leg', severity: 3, symptomName: 'Calf tightness', resolvedConceptId: '23924001', resolvedTerm: 'Tightness sensation (finding)' },
+  },
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(5),
+    title: 'Right knee stiffness',
+    description: 'Worse in the morning, improves after walking.',
+    data: { system: 'right-leg', severity: 4, symptomName: 'Knee stiffness', resolvedConceptId: '57676002', resolvedTerm: 'Joint pain (finding)' },
+  },
+];
+
+async function main() {
+  console.log('Connecting to twin...');
+  const twin = dtp.twins.connect(GRANT_TOKEN);
+  console.log(`Connected: ${twin.id}`);
+
+  console.log(`Seeding ${DEMO_EVENTS.length} demo events...`);
+  for (const event of DEMO_EVENTS) {
+    const created = await twin.flag(event.data.system, {
+      eventType: event.eventType,
+      occurredAt: event.occurredAt,
+      title: event.title,
+      description: event.description,
+      data: event.data,
+    });
+    console.log(`  ✓ ${event.occurredAt.slice(0, 10)} — ${event.title} (${event.data.system}, severity ${event.data.severity})`);
+  }
+
+  console.log('Done. Refresh the app to see the new patterns.');
+}
+
+main().catch((err) => {
+  console.error('Seed failed:', err);
+  process.exit(1);
+});

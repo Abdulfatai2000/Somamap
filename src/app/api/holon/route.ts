@@ -35,7 +35,10 @@ export async function GET(request: Request) {
         holonApiKey,
       });
       const results = await dtpWithHolon.holon.concepts.search(q);
-      return NextResponse.json({ hits: results.hits ?? [], source: 'holon-real' });
+      const realHits = (results.hits ?? []).filter(
+        (h: any) => h.term && !h.term.toLowerCase().includes('unspecified')
+      );
+      return NextResponse.json({ hits: realHits, source: 'holon-real' });
     } catch (err: any) {
       console.error('[holon route] real HOLON call failed:', err.message);
       // Fall through to mock so the UI stays functional
@@ -70,10 +73,8 @@ export async function GET(request: Request) {
     .flatMap(([, concepts]) => concepts)
     .slice(0, 4);
 
-  // Generic fallback if nothing matched
-  if (hits.length === 0) {
-    hits.push({ conceptId: '404684003', term: `${q} — clinical finding (unspecified)` });
-  }
+  // Filter out low-quality / unspecified results
+  const filteredHits = hits.filter(h => h.term && !h.term.toLowerCase().includes('unspecified'));
 
-  return NextResponse.json({ hits, source: 'mock' });
+  return NextResponse.json({ hits: filteredHits, source: 'mock' });
 }

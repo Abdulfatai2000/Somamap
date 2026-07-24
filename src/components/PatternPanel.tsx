@@ -77,9 +77,10 @@ export function PatternPanel({ events }: PatternPanelProps) {
           <h3 className="text-base font-bold text-slate-800">Your Patterns</h3>
           <p className="text-xs text-slate-400 mt-0.5">{totalLogs} symptom log{totalLogs !== 1 ? 's' : ''} analysed</p>
         </div>
-        {/* Demo badge */}
-        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-200">
-          Mock data
+        {/* Live Twin status badge */}
+        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          Live Twin
         </span>
       </div>
 

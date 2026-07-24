@@ -1,26 +1,35 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BodyMap } from '@/components/BodyMap';
 import { SymptomForm } from '@/components/SymptomForm';
 import { PatternPanel } from '@/components/PatternPanel';
 import { BodySystem } from '@/lib/constants';
-
-// ══════════════════════════════════════════════════════════════════
-//  ⚡ SWAP POINT — Phase 5.5 mock data source
-//
-//  Replace this import with real events from the twin API:
-//
-//    const events = await twin.events.list({ limit: 200 });
-//
-//  Then pass `events` (cast to SymptomEvent[]) to <PatternPanel>.
-//  The pattern functions in lib/patterns.ts need no other changes.
-// ══════════════════════════════════════════════════════════════════
-import { MOCK_EVENTS } from '@/test/mockFixture';
+import type { SymptomEvent } from '@/lib/types';
 
 export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<BodySystem | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [events, setEvents] = useState<SymptomEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchTwinEvents = async () => {
+    try {
+      const res = await fetch('/api/twin');
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.events)) {
+        setEvents(data.events);
+      }
+    } catch (err) {
+      console.error('Failed to fetch twin events:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTwinEvents();
+  }, []);
 
   const handleRegionSelect = (region: BodySystem) => {
     setSelectedRegion(region);
@@ -30,7 +39,17 @@ export default function Home() {
   const handleCloseForm = () => {
     setIsFormOpen(false);
     setSelectedRegion(null);
+    fetchTwinEvents(); // Refresh twin events after a submission
   };
+
+  // Compute count of logged symptoms per body system for the BodyMap highlight
+  const loggedCounts = events.reduce((acc, evt) => {
+    const sys = evt.data?.system;
+    if (sys) {
+      acc[sys] = (acc[sys] || 0) + 1;
+    }
+    return acc;
+  }, {} as Record<string, number>);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100">
@@ -72,16 +91,13 @@ export default function Home() {
             <BodyMap
               onRegionSelect={handleRegionSelect}
               selectedRegion={selectedRegion}
+              loggedCounts={loggedCounts}
             />
           </div>
 
           {/* Pattern Panel */}
           <div className="w-full lg:max-w-sm">
-            {/*
-              ⚡ SWAP POINT: Replace MOCK_EVENTS with real events
-              (see the import at the top of this file)
-            */}
-            <PatternPanel events={MOCK_EVENTS} />
+            <PatternPanel events={events} />
           </div>
         </div>
       </div>

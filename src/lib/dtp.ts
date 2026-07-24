@@ -7,9 +7,12 @@ if (!apiKey) {
   console.warn("DTP_API_KEY is not set in environment variables.");
 }
 
-// Instantiate the DTP client with the API key
+// Instantiate the DTP client with the API key and sandbox base URL.
+// Synthetic sandbox twins live on a separate host — without this, all
+// twin requests hit api.ontomorph.com and return FORBIDDEN.
 export const dtp = new DTP({
   apiKey: apiKey || 'placeholder_for_build',
+  baseUrl: process.env.DTP_BASE_URL ?? 'https://sandbox-api.ontomorph.com',
 });
 
 export async function checkSchema() {

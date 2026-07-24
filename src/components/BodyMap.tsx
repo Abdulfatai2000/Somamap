@@ -4,115 +4,139 @@ import { BodySystem } from '@/lib/constants';
 interface BodyMapProps {
   onRegionSelect: (region: BodySystem) => void;
   selectedRegion?: BodySystem | null;
+  loggedCounts?: Record<string, number>;
 }
 
-export function BodyMap({ onRegionSelect, selectedRegion }: BodyMapProps) {
+/**
+ * Visual region state:
+ *  selected  → indigo-500 fill, indigo-600 stroke
+ *  has logs  → indigo-100 fill, indigo-300 stroke (shows historical activity at rest)
+ *  default   → slate-50 fill, slate-200 stroke (always visible, not relying on hover alone)
+ */
+export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {} }: BodyMapProps) {
   const [view, setView] = useState<'front' | 'back'>('front');
 
-  const width = 240;
-  const height = 480;
-
-  const getRegionClass = (region: BodySystem) => {
+  const getRegionProps = (region: BodySystem) => {
     const isActive = selectedRegion === region;
-    return `cursor-pointer transition-all duration-200 stroke-[2px] ${
-      isActive 
-        ? 'fill-indigo-500 stroke-indigo-600' 
-        : 'fill-slate-100 stroke-slate-300 hover:fill-indigo-100 hover:stroke-indigo-300'
-    }`;
+    const hasLogs = (loggedCounts[region] || 0) > 0;
+    const count = loggedCounts[region] || 0;
+
+    let fill: string, stroke: string;
+    if (isActive)    { fill = '#6366f1'; stroke = '#4f46e5'; }
+    else if (hasLogs){ fill = '#e0e7ff'; stroke = '#a5b4fc'; }
+    else             { fill = '#f8fafc'; stroke = '#cbd5e1'; }
+
+    return {
+      fill,
+      stroke,
+      strokeWidth: isActive ? 2.5 : 1.5,
+      style: { cursor: 'pointer', transition: 'fill 0.18s, stroke 0.18s' } as React.CSSProperties,
+      onClick: () => onRegionSelect(region),
+      'aria-label': `${region}${count ? ` (${count} log${count > 1 ? 's' : ''})` : ''} — tap to log symptom`,
+    };
   };
 
   return (
-    <div className="flex flex-col items-center max-w-sm w-full mx-auto p-6 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
-      <div className="flex p-1 space-x-1 mb-8 bg-slate-100/80 rounded-2xl backdrop-blur-md w-full">
-        <button
-          onClick={() => setView('front')}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-            view === 'front' 
-              ? 'bg-white text-indigo-700 shadow-sm' 
-              : 'text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          Front View
-        </button>
-        <button
-          onClick={() => setView('back')}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-            view === 'back' 
-              ? 'bg-white text-indigo-700 shadow-sm' 
-              : 'text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          Back View
-        </button>
+    <div className="flex flex-col items-center w-full mx-auto p-5 sm:p-6 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100">
+      {/* Front / Back toggle */}
+      <div className="flex p-1 gap-1 mb-6 bg-slate-100 rounded-2xl w-full">
+        {(['front', 'back'] as const).map((v) => (
+          <button
+            key={v}
+            onClick={() => setView(v)}
+            className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+              view === v ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            {v === 'front' ? 'Front' : 'Back'}
+          </button>
+        ))}
       </div>
 
+      {/* Region label hint */}
+      <p className="text-[11px] font-medium text-slate-400 mb-3 tracking-wide uppercase">
+        Tap a region to log a symptom
+      </p>
+
+      {/* SVG body map — inline fills so resting-state borders always appear in recordings */}
       <div className="relative">
-        <svg width={width} height={height} viewBox="0 0 240 480" className="drop-shadow-sm">
-          {/* Head */}
-          <circle 
-            cx="120" 
-            cy="50" 
-            r="35" 
-            className={getRegionClass('head')} 
-            onClick={() => onRegionSelect('head')} 
-          />
-          
+        <svg
+          width="220"
+          height="460"
+          viewBox="0 0 240 480"
+          className="overflow-visible"
+          aria-label="Body map"
+          role="img"
+        >
+          {/* ── Head ─────────────────────────────────────────────────────── */}
+          <circle cx="120" cy="50" r="36" {...getRegionProps('head')} />
+
+          {/* ── Neck connector ───────────────────────────────────────────── */}
+          <rect x="108" y="84" width="24" height="14" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
+
           {view === 'front' ? (
             <>
               {/* Chest */}
-              <path 
-                d="M 85 95 L 155 95 L 145 180 L 95 180 Z" 
-                className={getRegionClass('chest')} 
-                onClick={() => onRegionSelect('chest')} 
-              />
+              <path d="M 82 98 L 158 98 L 148 182 L 92 182 Z" {...getRegionProps('chest')} />
               {/* Abdomen */}
-              <path 
-                d="M 95 180 L 145 180 L 140 260 L 100 260 Z" 
-                className={getRegionClass('abdomen')} 
-                onClick={() => onRegionSelect('abdomen')} 
-              />
+              <path d="M 92 182 L 148 182 L 143 262 L 97 262 Z" {...getRegionProps('abdomen')} />
             </>
-        ) : (
-            <>
-              {/* Back */}
-              <path 
-                d="M 85 95 L 155 95 L 140 260 L 100 260 Z" 
-                className={getRegionClass('back')} 
-                onClick={() => onRegionSelect('back')} 
-              />
-            </>
+          ) : (
+            /* Back — spans chest+abdomen height */
+            <path d="M 82 98 L 158 98 L 143 262 L 97 262 Z" {...getRegionProps('back')} />
           )}
 
-          {/* Arms (Anatomical Left/Right from Patient perspective) */}
-          {/* Patient's Right Arm (Screen Left) */}
-          <path 
-            d="M 80 95 L 45 220 L 60 220 L 90 140 Z" 
-            className={getRegionClass('right-arm')} 
-            onClick={() => onRegionSelect('right-arm')} 
-          />
-          
-          {/* Patient's Left Arm (Screen Right) */}
-          <path 
-            d="M 160 95 L 195 220 L 180 220 L 150 140 Z" 
-            className={getRegionClass('left-arm')} 
-            onClick={() => onRegionSelect('left-arm')} 
-          />
-          
-          {/* Legs */}
-          {/* Patient's Right Leg (Screen Left) */}
-          <path 
-            d="M 100 260 L 85 430 L 115 430 L 120 260 Z" 
-            className={getRegionClass('right-leg')} 
-            onClick={() => onRegionSelect('right-leg')} 
-          />
-          
-          {/* Patient's Left Leg (Screen Right) */}
-          <path 
-            d="M 140 260 L 155 430 L 125 430 L 120 260 Z" 
-            className={getRegionClass('left-leg')} 
-            onClick={() => onRegionSelect('left-leg')} 
-          />
+          {/* ── Arms ─────────────────────────────────────────────────────── */}
+          {/* Patient's right arm (screen left) */}
+          <path d="M 82 98 L 42 228 L 60 228 L 88 148 Z" {...getRegionProps('right-arm')} />
+          {/* Patient's left arm (screen right) */}
+          <path d="M 158 98 L 198 228 L 180 228 L 152 148 Z" {...getRegionProps('left-arm')} />
+
+          {/* ── Hips connector ───────────────────────────────────────────── */}
+          <path d="M 97 262 L 143 262 L 148 282 L 92 282 Z" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
+
+          {/* ── Legs ─────────────────────────────────────────────────────── */}
+          {/* Patient's right leg (screen left) */}
+          <path d="M 92 282 L 76 444 L 110 444 L 118 282 Z" {...getRegionProps('right-leg')} />
+          {/* Patient's left leg (screen right) */}
+          <path d="M 148 282 L 164 444 L 130 444 L 122 282 Z" {...getRegionProps('left-leg')} />
+
+          {/* ── Log count badges ─────────────────────────────────────────── */}
+          {Object.entries(loggedCounts).map(([region, count]) => {
+            if (!count) return null;
+            const pos: Record<string, [number, number]> = {
+              head: [120, 50], chest: [120, 138], abdomen: [120, 220],
+              back: [120, 178], 'right-arm': [57, 168], 'left-arm': [183, 168],
+              'right-leg': [95, 360], 'left-leg': [145, 360],
+            };
+            const [cx, cy] = pos[region] ?? [0, 0];
+            if (!cx) return null;
+            return (
+              <g key={region} style={{ pointerEvents: 'none' }}>
+                <circle cx={cx} cy={cy} r="11" fill="#4f46e5" opacity="0.9" />
+                <text x={cx} y={cy + 4} textAnchor="middle" fill="white" fontSize="10" fontWeight="700">
+                  {count > 9 ? '9+' : count}
+                </text>
+              </g>
+            );
+          })}
         </svg>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center gap-4 mt-5 text-[11px] text-slate-400 font-medium">
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-sm bg-slate-50 border border-slate-300 inline-block" />
+          No logs
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-sm bg-indigo-100 border border-indigo-300 inline-block" />
+          Has logs
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-sm bg-indigo-500 border border-indigo-600 inline-block" />
+          Selected
+        </span>
       </div>
     </div>
   );

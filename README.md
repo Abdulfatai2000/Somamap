@@ -26,7 +26,7 @@ Symptom names can optionally be resolved to structured clinical terms via the **
 |---|---|
 | **Digital Twin** (`dtp.twins.connect`) | User's health state is persisted across sessions on their twin |
 | **Events** (`twin.events.list`, `twin.flag`) | Symptoms written as `eventType: "symptom"` events with `data.system` (body region), `data.severity`, `data.symptomName` |
-| **Body Systems** | `data.system` is an unbounded client-defined string matching the 20 BODY_SYSTEMS constants (`head`, `chest`, `abdomen`, `back`, `left-shoulder`, `right-shoulder`, `left-upper-arm`, `right-upper-arm`, `left-forearm`, `right-forearm`, `left-hand`, `right-hand`, `left-thigh`, `right-thigh`, `left-lower-leg`, `right-lower-leg`, `left-knee`, `right-knee`, `left-foot`, `right-foot`) |
+| **Body Systems** | `data.system` is an unbounded client-defined string matching the 23 BODY_SYSTEMS constants (`head`, `chest`, `abdomen`, `back`, `waist`, `left-shoulder`, `right-shoulder`, `left-elbow`, `right-elbow`, `left-upper-arm`, `right-upper-arm`, `left-forearm`, `right-forearm`, `left-hand`, `right-hand`, `left-thigh`, `right-thigh`, `left-knee`, `right-knee`, `left-lower-leg`, `right-lower-leg`, `left-foot`, `right-foot`) |
 | **HOLON** (`dtp.holon.concepts.search`) | Debounced clinical-term lookup on the symptom name field; resolved concept stored as `data.resolvedConceptId` + `data.resolvedTerm` |
 | **Grant Tokens** | Single grant token from the sandbox dashboard scopes all read/write; token lives in `.env.local`, never exposed to the client |
 

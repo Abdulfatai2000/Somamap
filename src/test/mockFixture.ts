@@ -97,13 +97,23 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     data: { system: 'right-shoulder', severity: 4, symptomName: 'Shoulder stiffness' },
   },
 
-  // ── left-lower-leg (1 entry) ─────────────────────────────────────────────
+  // ── right-elbow (1 entry) ────────────────────────────────────────────────
   {
     id: 'evt-010',
     twinId: 'twin-demo',
     eventType: 'symptom_log',
     occurredAt: daysAgo(3),
-    title: 'Shin splint',
-    data: { system: 'left-lower-leg', severity: 5, symptomName: 'Shin splint' },
+    title: 'Right elbow soreness',
+    data: { system: 'right-elbow', severity: 3, symptomName: 'Elbow soreness' },
+  },
+
+  // ── waist (1 entry) ─────────────────────────────────────────────────────
+  {
+    id: 'evt-011',
+    twinId: 'twin-demo',
+    eventType: 'symptom_log',
+    occurredAt: daysAgo(1),
+    title: 'Lower back stiffness',
+    data: { system: 'waist', severity: 4, symptomName: 'Lower back stiffness' },
   },
 ];

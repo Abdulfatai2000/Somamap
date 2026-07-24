@@ -99,6 +99,15 @@ const DEMO_EVENTS = [
     data: { system: 'right-shoulder', severity: 4, symptomName: 'Shoulder stiffness', resolvedConceptId: '57676002', resolvedTerm: 'Joint pain (finding)' },
   },
 
+  // ── right-elbow (1 entry) ────────────────────────────────────────────────
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(8),
+    title: 'Right elbow soreness',
+    description: 'After lifting, tender to touch.',
+    data: { system: 'right-elbow', severity: 3, symptomName: 'Elbow soreness' },
+  },
+
   // ── left-forearm (1 entry) ────────────────────────────────────────────────
   {
     eventType: 'symptom' as const,
@@ -115,6 +124,15 @@ const DEMO_EVENTS = [
     title: 'Left wrist tingling',
     description: 'Numbness in fingers after sleeping on hand.',
     data: { system: 'left-hand', severity: 2, symptomName: 'Wrist tingling' },
+  },
+
+  // ── waist (1 entry) ─────────────────────────────────────────────────────
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(6),
+    title: 'Lower back stiffness',
+    description: 'After sitting too long, tight across waist.',
+    data: { system: 'waist', severity: 4, symptomName: 'Lower back stiffness' },
   },
 
   // ── right-knee (1 entry) ─────────────────────────────────────────────────

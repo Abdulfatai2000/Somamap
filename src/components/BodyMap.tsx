@@ -22,22 +22,25 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
   };
 
   const regionsInView = view === 'front'
-    ? (['head', 'chest', 'abdomen', 'left-shoulder', 'right-shoulder', 'left-upper-arm', 'right-upper-arm', 'left-forearm', 'right-forearm', 'left-hand', 'right-hand', 'left-thigh', 'right-thigh', 'left-lower-leg', 'right-lower-leg', 'left-knee', 'right-knee', 'left-foot', 'right-foot'] as BodySystem[])
-    : (['head', 'back', 'left-shoulder', 'right-shoulder', 'left-upper-arm', 'right-upper-arm', 'left-forearm', 'right-forearm', 'left-hand', 'right-hand', 'left-thigh', 'right-thigh', 'left-lower-leg', 'right-lower-leg', 'left-knee', 'right-knee', 'left-foot', 'right-foot'] as BodySystem[]);
+    ? (['head', 'chest', 'abdomen', 'waist', 'left-shoulder', 'right-shoulder', 'left-elbow', 'right-elbow', 'left-upper-arm', 'right-upper-arm', 'left-forearm', 'right-forearm', 'left-hand', 'right-hand', 'left-thigh', 'right-thigh', 'left-knee', 'right-knee', 'left-lower-leg', 'right-lower-leg', 'left-foot', 'right-foot'] as BodySystem[])
+    : (['head', 'back', 'waist', 'left-shoulder', 'right-shoulder', 'left-elbow', 'right-elbow', 'left-upper-arm', 'right-upper-arm', 'left-forearm', 'right-forearm', 'left-hand', 'right-hand', 'left-thigh', 'right-thigh', 'left-knee', 'right-knee', 'left-lower-leg', 'right-lower-leg', 'left-foot', 'right-foot'] as BodySystem[]);
 
   const labelPositions: Record<string, { x: number; y: number }> = {
     head: { x: 120, y: 50 },
     chest: { x: 120, y: 138 },
-    abdomen: { x: 120, y: 220 },
+    abdomen: { x: 120, y: 230 },
+    waist: { x: 120, y: 268 },
     back: { x: 120, y: 178 },
     'right-shoulder': { x: 68, y: 110 },
     'left-shoulder': { x: 172, y: 110 },
-    'right-upper-arm': { x: 65, y: 155 },
-    'left-upper-arm': { x: 175, y: 155 },
-    'right-forearm': { x: 65, y: 210 },
-    'left-forearm': { x: 175, y: 210 },
-    'right-hand': { x: 60, y: 255 },
-    'left-hand': { x: 180, y: 255 },
+    'right-elbow': { x: 50, y: 185 },
+    'left-elbow': { x: 190, y: 185 },
+    'right-upper-arm': { x: 65, y: 145 },
+    'left-upper-arm': { x: 175, y: 145 },
+    'right-forearm': { x: 65, y: 225 },
+    'left-forearm': { x: 175, y: 225 },
+    'right-hand': { x: 50, y: 255 },
+    'left-hand': { x: 190, y: 255 },
     'right-thigh': { x: 98, y: 320 },
     'left-thigh': { x: 142, y: 320 },
     'right-knee': { x: 98, y: 368 },
@@ -134,20 +137,24 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
 
           {/* ── Arms ─────────────────────────────────────────────────────── */}
           {/* Patient's right upper arm (screen left) */}
-          <path d="M 82 120 L 60 130 L 42 228 L 60 228 L 88 148 Z" {...getRegionProps('right-upper-arm')} />
+          <path d="M 82 120 L 60 130 L 42 180 L 60 180 L 88 148 Z" {...getRegionProps('right-upper-arm')} />
+          {/* Patient's right elbow (screen left) */}
+          <path d="M 42 180 L 60 180 L 58 200 L 44 200 Z" {...getRegionProps('right-elbow')} />
           {/* Patient's right forearm (screen left) */}
-          <path d="M 88 148 L 60 228 L 42 228 L 44 244 L 60 244 L 92 165 Z" {...getRegionProps('right-forearm')} />
+          <path d="M 44 200 L 58 200 L 60 228 L 42 228 L 44 244 L 60 244 L 92 165 Z" {...getRegionProps('right-forearm')} />
           {/* Patient's right hand (screen left) */}
           <path d="M 44 244 L 60 244 L 58 260 L 42 260 Z" {...getRegionProps('right-hand')} />
           {/* Patient's left upper arm (screen right) */}
-          <path d="M 158 120 L 180 130 L 198 228 L 180 228 L 152 148 Z" {...getRegionProps('left-upper-arm')} />
+          <path d="M 158 120 L 180 130 L 198 180 L 180 180 L 152 148 Z" {...getRegionProps('left-upper-arm')} />
+          {/* Patient's left elbow (screen right) */}
+          <path d="M 198 180 L 180 180 L 182 200 L 196 200 Z" {...getRegionProps('left-elbow')} />
           {/* Patient's left forearm (screen right) */}
-          <path d="M 152 148 L 180 228 L 198 228 L 196 244 L 180 244 L 148 165 Z" {...getRegionProps('left-forearm')} />
+          <path d="M 196 200 L 182 200 L 180 228 L 198 228 L 196 244 L 180 244 L 148 165 Z" {...getRegionProps('left-forearm')} />
           {/* Patient's left hand (screen right) */}
           <path d="M 196 244 L 180 244 L 182 260 L 198 260 Z" {...getRegionProps('left-hand')} />
 
-          {/* ── Hips connector ───────────────────────────────────────────── */}
-          <path d="M 97 262 L 143 262 L 148 282 L 92 282 Z" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
+          {/* ── Waist / Hip band ──────────────────────────────────────────── */}
+          <path d="M 92 262 L 148 262 L 148 282 L 92 282 Z" {...getRegionProps('waist')} />
 
           {/* ── Legs ─────────────────────────────────────────────────────── */}
           {/* Patient's right thigh (screen left) */}
@@ -172,9 +179,10 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
             if (!count || !regionsInView.includes(region as BodySystem)) return null;
             const pos: Record<string, [number, number]> = {
               head: [120, 50], chest: [120, 138], abdomen: [120, 220],
-              back: [120, 178], 'right-shoulder': [57, 105], 'left-shoulder': [183, 105],
+              waist: [120, 268], back: [120, 178], 'right-shoulder': [57, 105], 'left-shoulder': [183, 105],
+              'right-elbow': [45, 185], 'left-elbow': [195, 185],
               'right-upper-arm': [57, 140], 'left-upper-arm': [183, 140],
-              'right-forearm': [57, 195], 'left-forearm': [183, 195],
+              'right-forearm': [57, 215], 'left-forearm': [183, 215],
               'right-hand': [50, 250], 'left-hand': [190, 250],
               'right-thigh': [95, 320], 'left-thigh': [145, 320],
               'right-knee': [95, 368], 'left-knee': [145, 368],

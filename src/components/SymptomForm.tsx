@@ -7,9 +7,10 @@ import type { HolonConcept } from '@/lib/types';
 interface SymptomFormProps {
   region: BodySystem;
   onClose: () => void;
+  selectedDate?: string | null;
 }
 
-export function SymptomForm({ region, onClose }: SymptomFormProps) {
+export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps) {
   const [name, setName] = useState('');
   const [symptomType, setSymptomType] = useState('pain');
   const [severity, setSeverity] = useState<number>(5);
@@ -73,9 +74,20 @@ export function SymptomForm({ region, onClose }: SymptomFormProps) {
     setIsSubmitting(true);
     setErrorMsg('');
 
+    let occurredAt: string;
+    if (selectedDate) {
+      const [year, month, day] = selectedDate.split('-').map(Number);
+      const d = new Date(year, month - 1, day);
+      const now = new Date();
+      d.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+      occurredAt = d.toISOString();
+    } else {
+      occurredAt = new Date().toISOString();
+    }
+
     const payload = {
       eventType: 'symptom_log',
-      occurredAt: new Date().toISOString(),
+      occurredAt,
       title: name || `Symptom in ${region}`,
       description: notes,
       data: {

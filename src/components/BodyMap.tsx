@@ -6,12 +6,13 @@ interface BodyMapProps {
   selectedRegion?: BodySystem | null;
   loggedCounts?: Record<string, number>;
   recentSeverityByRegion?: Record<string, { severity: number; occurredAt: string }>;
+  selectedDate?: string | null;
 }
 
 const HOVER_FILL = '#e0e7ff';
 const HOVER_STROKE = '#6366f1';
 
-export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, recentSeverityByRegion = {} }: BodyMapProps) {
+export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, recentSeverityByRegion = {}, selectedDate }: BodyMapProps) {
   const [view, setView] = useState<'front' | 'back'>('front');
   const [hoveredRegion, setHoveredRegion] = useState<BodySystem | null>(null);
 
@@ -98,6 +99,13 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
           </button>
         ))}
       </div>
+
+      {/* Date filter indicator */}
+      {selectedDate && (
+        <div className="mb-3 text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg">
+          Showing: {selectedDate}
+        </div>
+      )}
 
       {/* Region label hint */}
       <p className="text-[11px] font-medium text-slate-400 mb-3 tracking-wide uppercase">

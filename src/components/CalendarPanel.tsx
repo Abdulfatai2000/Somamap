@@ -5,6 +5,8 @@ import type { SymptomEvent } from '@/lib/types';
 
 interface CalendarPanelProps {
   events: SymptomEvent[];
+  selectedDate?: string | null;
+  onDateSelect?: (date: string | null) => void;
 }
 
 const severityColor = (severity: number): string => {
@@ -23,12 +25,11 @@ const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-export function CalendarPanel({ events }: CalendarPanelProps) {
+export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPanelProps) {
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
   });
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const daysInMonth = new Date(currentMonth.year, currentMonth.month + 1, 0).getDate();
   const firstDayOfWeek = new Date(currentMonth.year, currentMonth.month, 1).getDay();
@@ -64,6 +65,14 @@ export function CalendarPanel({ events }: CalendarPanelProps) {
     });
   };
 
+  const handleDayClick = (dateKey: string) => {
+    if (selectedDate === dateKey) {
+      onDateSelect?.(null);
+    } else {
+      onDateSelect?.(dateKey);
+    }
+  };
+
   const renderCalendarDays = () => {
     const days: React.ReactNode[] = [];
     for (let i = 0; i < firstDayOfWeek; i++) {
@@ -78,7 +87,7 @@ export function CalendarPanel({ events }: CalendarPanelProps) {
       days.push(
         <button
           key={day}
-          onClick={() => setSelectedDate(isSelected ? null : dateKey)}
+          onClick={() => handleDayClick(dateKey)}
           className={`
             h-8 w-8 mx-auto rounded-lg flex items-center justify-center text-xs font-medium
             transition-all duration-150 relative
@@ -118,9 +127,9 @@ export function CalendarPanel({ events }: CalendarPanelProps) {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto">
+    <div className="w-full max-w-sm mx-auto flex flex-col h-full">
       {/* Panel header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <div>
           <h3 className="text-base font-bold text-slate-800">Calendar</h3>
           <p className="text-xs text-slate-400 mt-0.5">
@@ -129,8 +138,8 @@ export function CalendarPanel({ events }: CalendarPanelProps) {
         </div>
       </div>
 
-      {/* Month navigation */}
-      <div className="flex items-center justify-between mb-4">
+      {/* Month navigation — fixed */}
+      <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <button
           onClick={goToPrevMonth}
           className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
@@ -152,70 +161,79 @@ export function CalendarPanel({ events }: CalendarPanelProps) {
         </button>
       </div>
 
-      {/* Day-of-week headers */}
-      <div className="grid grid-cols-7 mb-2">
-        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-          <div key={d} className="h-6 flex items-center justify-center text-[10px] font-semibold text-slate-400 uppercase">
-            {d}
-          </div>
-        ))}
+      {/* Calendar grid — always visible, does NOT scroll */}
+      <div className="flex-shrink-0">
+        {/* Day-of-week headers */}
+        <div className="grid grid-cols-7 mb-2">
+          {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
+            <div key={d} className="h-6 flex items-center justify-center text-[10px] font-semibold text-slate-400 uppercase">
+              {d}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar grid */}
+        <div className="grid grid-cols-7 gap-y-1">
+          {renderCalendarDays()}
+        </div>
       </div>
 
-      {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-y-1 mb-4">
-        {renderCalendarDays()}
-      </div>
-
-      {/* Selected day popover */}
-      {selectedDate && (
-        <div className="mt-4 p-4 rounded-2xl border border-slate-100 bg-white">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-semibold text-slate-700">
-              {formatDate(selectedDate)}
-            </h4>
-            <button
-              onClick={() => setSelectedDate(null)}
-              className="text-[11px] text-slate-400 hover:text-slate-600"
-            >
-              Close
-            </button>
-          </div>
-          {selectedEvents.length === 0 ? (
-            <p className="text-sm text-slate-400 italic">No symptoms logged on this day.</p>
-          ) : (
-            <div className="space-y-2">
-              {selectedEvents.map(evt => (
-                <div key={evt.id} className="flex items-start gap-3 p-2.5 rounded-xl bg-slate-50">
-                  <div className="flex-shrink-0 mt-0.5">
-                    <span
-                      className="inline-block w-2.5 h-2.5 rounded-full"
-                      style={{ backgroundColor: severityColor(evt.data?.severity ?? 5) }}
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-slate-800 truncate">
-                      {evt.data?.symptomName || evt.title}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-100">
-                        {evt.data?.system}
-                      </span>
-                      <span className="text-[11px] text-slate-400">
-                        severity {evt.data?.severity ?? '—'}
-                      </span>
-                      {evt.data?.duration && (
-                        <span className="text-[11px] text-slate-400">
-                          • {evt.data.duration}
+      {/* Selected day events — scrollable */}
+      <div className="flex-1 overflow-y-auto min-h-0 mt-4">
+        {selectedDate ? (
+          <div className="p-4 rounded-2xl border border-slate-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-slate-700">
+                {formatDate(selectedDate)}
+              </h4>
+              <button
+                onClick={() => onDateSelect?.(null)}
+                className="text-[11px] text-slate-400 hover:text-slate-600"
+              >
+                Close
+              </button>
+            </div>
+            {selectedEvents.length === 0 ? (
+              <p className="text-sm text-slate-400 italic">No symptoms logged on this day.</p>
+            ) : (
+              <div className="space-y-2">
+                {selectedEvents.map(evt => (
+                  <div key={evt.id} className="flex items-start gap-3 p-2.5 rounded-xl bg-slate-50">
+                    <div className="flex-shrink-0 mt-0.5">
+                      <span
+                        className="inline-block w-2.5 h-2.5 rounded-full"
+                        style={{ backgroundColor: severityColor(evt.data?.severity ?? 5) }}
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-slate-800 truncate">
+                        {evt.data?.symptomName || evt.title}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-100">
+                          {evt.data?.system}
                         </span>
-                      )}
+                        <span className="text-[11px] text-slate-400">
+                          severity {evt.data?.severity ?? '—'}
+                        </span>
+                        {evt.data?.duration && (
+                          <span className="text-[11px] text-slate-400">
+                            • {evt.data.duration}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-sm text-slate-400 italic">
+            Select a day to view symptoms
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -17,6 +17,7 @@ export default function Home() {
   const [events, setEvents] = useState<SymptomEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('patterns');
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const fetchTwinEvents = async () => {
     try {
@@ -51,7 +52,7 @@ export default function Home() {
   const handleCloseForm = () => {
     setIsFormOpen(false);
     setSelectedRegion(null);
-    fetchTwinEvents(); // Refresh twin events after a submission
+    fetchTwinEvents();
   };
 
   const handleDeleteEvent = async (eventId: string) => {
@@ -66,7 +67,7 @@ export default function Home() {
         console.error('Delete failed:', data);
         alert(data.error || 'Failed to delete entry');
       } else {
-        fetchTwinEvents(); // Refresh list after deletion
+        setEvents(prev => prev.filter(e => e.id !== eventId));
       }
     } catch (err) {
       console.error('Delete error:', err);
@@ -74,8 +75,16 @@ export default function Home() {
     }
   };
 
-  // Compute count of logged symptoms per body system for the BodyMap highlight
-  const loggedCounts = events.reduce((acc, evt) => {
+  const getDateKey = (iso: string): string => {
+    const d = new Date(iso);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  const eventsForBodyMap = selectedDate
+    ? events.filter(e => getDateKey(e.occurredAt) === selectedDate)
+    : events;
+
+  const loggedCounts = eventsForBodyMap.reduce((acc, evt) => {
     const sys = evt.data?.system;
     if (sys) {
       acc[sys] = (acc[sys] || 0) + 1;
@@ -83,8 +92,7 @@ export default function Home() {
     return acc;
   }, {} as Record<string, number>);
 
-  // Compute most recent severity per region for color coding
-  const recentSeverityByRegion = events.reduce((acc, evt) => {
+  const recentSeverityByRegion = eventsForBodyMap.reduce((acc, evt) => {
     const sys = evt.data?.system;
     const sev = evt.data?.severity;
     if (sys && typeof sev === 'number') {
@@ -119,8 +127,16 @@ export default function Home() {
               Somamap
             </h1>
           </div>
-          </div>
-        </header>
+          {selectedDate && (
+            <button
+              onClick={() => setSelectedDate(null)}
+              className="text-xs font-medium px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"
+            >
+              Clear date filter
+            </button>
+          )}
+        </div>
+      </header>
 
       <div className="max-w-5xl mx-auto px-6 py-12">
         <div className="text-center mb-10 space-y-3">
@@ -165,9 +181,9 @@ export default function Home() {
 
             {/* Panel content — stretches to match body map height */}
             <div className="flex-1 min-h-0">
-              {viewMode === 'patterns' && <PatternPanel events={events} />}
-              {viewMode === 'timeline' && <TimelinePanel events={events} onDeleteEvent={handleDeleteEvent} />}
-              {viewMode === 'calendar' && <CalendarPanel events={events} />}
+              {viewMode === 'patterns' && <PatternPanel events={eventsForBodyMap} />}
+              {viewMode === 'timeline' && <TimelinePanel events={events} selectedDate={selectedDate} onDateSelect={setSelectedDate} onDeleteEvent={handleDeleteEvent} />}
+              {viewMode === 'calendar' && <CalendarPanel events={events} selectedDate={selectedDate} onDateSelect={setSelectedDate} />}
             </div>
           </div>
         </div>
@@ -178,6 +194,7 @@ export default function Home() {
         <SymptomForm
           region={selectedRegion}
           onClose={handleCloseForm}
+          selectedDate={selectedDate}
         />
       )}
     </main>

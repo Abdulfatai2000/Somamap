@@ -9,7 +9,7 @@ import { CalendarPanel } from '@/components/CalendarPanel';
 import { BodySystem } from '@/lib/constants';
 import type { SymptomEvent } from '@/lib/types';
 
-type ViewMode = 'patterns' | 'timeline' | 'calendar';
+type ViewMode = 'patterns' | 'timeline';
 
 export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<BodySystem | null>(null);
@@ -55,26 +55,6 @@ export default function Home() {
     fetchTwinEvents();
   };
 
-  const handleDeleteEvent = async (eventId: string) => {
-    try {
-      const res = await fetch('/api/twin', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventId }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        console.error('Delete failed:', data);
-        alert(data.error || 'Failed to delete entry');
-      } else {
-        setEvents(prev => prev.filter(e => e.id !== eventId));
-      }
-    } catch (err) {
-      console.error('Delete error:', err);
-      alert('Failed to delete entry');
-    }
-  };
-
   const getDateKey = (iso: string): string => {
     const d = new Date(iso);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -107,7 +87,6 @@ export default function Home() {
   const tabs: { key: ViewMode; label: string }[] = [
     { key: 'patterns', label: 'Patterns' },
     { key: 'timeline', label: 'Timeline' },
-    { key: 'calendar', label: 'Calendar' },
   ];
 
   return (
@@ -148,6 +127,11 @@ export default function Home() {
           </p>
         </div>
 
+        {/* Calendar date picker - above body map */}
+        <div className="flex justify-center mb-8">
+          <CalendarPanel events={events} selectedDate={selectedDate} onDateSelect={setSelectedDate} />
+        </div>
+
         {/* Two-column layout: body map + panel */}
         <div className="flex flex-col lg:flex-row gap-8 items-stretch">
           {/* Body Map */}
@@ -182,8 +166,7 @@ export default function Home() {
             {/* Panel content — stretches to match body map height */}
             <div className="flex-1 min-h-0">
               {viewMode === 'patterns' && <PatternPanel events={eventsForBodyMap} />}
-              {viewMode === 'timeline' && <TimelinePanel events={events} selectedDate={selectedDate} onDateSelect={setSelectedDate} onDeleteEvent={handleDeleteEvent} />}
-              {viewMode === 'calendar' && <CalendarPanel events={events} selectedDate={selectedDate} onDateSelect={setSelectedDate} />}
+              {viewMode === 'timeline' && <TimelinePanel events={events} selectedDate={selectedDate} onDateSelect={setSelectedDate} />}
             </div>
           </div>
         </div>

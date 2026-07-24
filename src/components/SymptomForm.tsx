@@ -74,6 +74,20 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
     setIsSubmitting(true);
     setErrorMsg('');
 
+    if (selectedDate) {
+      const [year, month, day] = selectedDate.split('-').map(Number);
+      const selected = new Date(year, month - 1, day);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      selected.setHours(0, 0, 0, 0);
+      
+      if (selected.getTime() !== today.getTime()) {
+        setErrorMsg('Symptoms can only be logged for today. Please select today\'s date.');
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
     let occurredAt: string;
     if (selectedDate) {
       const [year, month, day] = selectedDate.split('-').map(Number);

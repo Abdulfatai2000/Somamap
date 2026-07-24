@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import type { SymptomEvent } from '@/lib/types';
 
 interface CalendarPanelProps {
@@ -15,21 +15,26 @@ const severityColor = (severity: number): string => {
   return '#ef4444';
 };
 
-const formatDate = (iso: string): string => {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-};
-
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
+const isToday = (dateKey: string): boolean => {
+  const [year, month, day] = dateKey.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return date.getTime() === today.getTime();
+};
+
 export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPanelProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
   });
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const daysInMonth = new Date(currentMonth.year, currentMonth.month + 1, 0).getDate();
   const firstDayOfWeek = new Date(currentMonth.year, currentMonth.month, 1).getDay();
@@ -45,7 +50,17 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
     return map;
   }, [events]);
 
-  const selectedEvents = selectedDate ? (eventsByDate[selectedDate] ?? []) : [];
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
 
   const goToPrevMonth = () => {
     setCurrentMonth(prev => {
@@ -71,6 +86,7 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
     } else {
       onDateSelect?.(dateKey);
     }
+    setIsOpen(false);
   };
 
   const renderCalendarDays = () => {
@@ -83,6 +99,7 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
       const dayEvents = eventsByDate[dateKey] ?? [];
       const hasEvents = dayEvents.length > 0;
       const isSelected = selectedDate === dateKey;
+      const loggable = isToday(dateKey);
 
       days.push(
         <button
@@ -120,6 +137,9 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
               )}
             </span>
           )}
+          {loggable && !isSelected && (
+            <span className="absolute -top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500" title="Today" />
+          )}
         </button>
       );
     }
@@ -127,113 +147,85 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto flex flex-col h-full">
-      {/* Panel header */}
-      <div className="flex items-center justify-between mb-4 flex-shrink-0">
-        <div>
-          <h3 className="text-base font-bold text-slate-800">Calendar</h3>
-          <p className="text-xs text-slate-400 mt-0.5">
-            {events.length} symptom log{events.length !== 1 ? 's' : ''} total
-          </p>
-        </div>
-      </div>
+    <div className="relative w-full max-w-sm mx-auto" ref={dropdownRef}>
+      {/* Toggle button */}
+      <button
+        onClick={() => setIsOpen(prev => !prev)}
+        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors shadow-sm"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <span>Days</span>
+        {selectedDate && (
+          <span className="ml-1 text-[10px] font-medium text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-full">
+            Selected
+          </span>
+        )}
+      </button>
 
-      {/* Month navigation — fixed */}
-      <div className="flex items-center justify-between mb-4 flex-shrink-0">
-        <button
-          onClick={goToPrevMonth}
-          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <span className="text-sm font-semibold text-slate-700">
-          {MONTH_NAMES[currentMonth.month]} {currentMonth.year}
-        </span>
-        <button
-          onClick={goToNextMonth}
-          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-      </div>
+      {/* Dropdown popover */}
+      {isOpen && (
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 p-4 z-50">
+          {/* Month navigation */}
+          <div className="flex items-center justify-between mb-3">
+            <button
+              onClick={goToPrevMonth}
+              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <span className="text-sm font-semibold text-slate-700">
+              {MONTH_NAMES[currentMonth.month]} {currentMonth.year}
+            </span>
+            <button
+              onClick={goToNextMonth}
+              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          </div>
 
-      {/* Calendar grid — always visible, does NOT scroll */}
-      <div className="flex-shrink-0">
-        {/* Day-of-week headers */}
-        <div className="grid grid-cols-7 mb-2">
-          {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-            <div key={d} className="h-6 flex items-center justify-center text-[10px] font-semibold text-slate-400 uppercase">
-              {d}
-            </div>
-          ))}
-        </div>
+          {/* Day-of-week headers */}
+          <div className="grid grid-cols-7 mb-1">
+            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
+              <div key={d} className="h-5 flex items-center justify-center text-[10px] font-semibold text-slate-400 uppercase">
+                {d}
+              </div>
+            ))}
+          </div>
 
-        {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-y-1">
-          {renderCalendarDays()}
-        </div>
-      </div>
+          {/* Calendar grid */}
+          <div className="grid grid-cols-7 gap-y-0.5">
+            {renderCalendarDays()}
+          </div>
 
-      {/* Selected day events — scrollable */}
-      <div className="flex-1 overflow-y-auto min-h-0 mt-4">
-        {selectedDate ? (
-          <div className="p-4 rounded-2xl border border-slate-100 bg-white">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-semibold text-slate-700">
-                {formatDate(selectedDate)}
-              </h4>
+          {/* Selected date indicator */}
+          {selectedDate && (
+            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <span className="text-xs text-slate-500">
+                Viewing: <strong className="text-slate-700">{selectedDate}</strong>
+              </span>
               <button
-                onClick={() => onDateSelect?.(null)}
-                className="text-[11px] text-slate-400 hover:text-slate-600"
+                onClick={() => {
+                  onDateSelect?.(null);
+                  setIsOpen(false);
+                }}
+                className="text-[11px] text-indigo-600 hover:text-indigo-700 font-medium"
               >
-                Close
+                Clear filter
               </button>
             </div>
-            {selectedEvents.length === 0 ? (
-              <p className="text-sm text-slate-400 italic">No symptoms logged on this day.</p>
-            ) : (
-              <div className="space-y-2">
-                {selectedEvents.map(evt => (
-                  <div key={evt.id} className="flex items-start gap-3 p-2.5 rounded-xl bg-slate-50">
-                    <div className="flex-shrink-0 mt-0.5">
-                      <span
-                        className="inline-block w-2.5 h-2.5 rounded-full"
-                        style={{ backgroundColor: severityColor(evt.data?.severity ?? 5) }}
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-slate-800 truncate">
-                        {evt.data?.symptomName || evt.title}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-100">
-                          {evt.data?.system}
-                        </span>
-                        <span className="text-[11px] text-slate-400">
-                          severity {evt.data?.severity ?? '—'}
-                        </span>
-                        {evt.data?.duration && (
-                          <span className="text-[11px] text-slate-400">
-                            • {evt.data.duration}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-sm text-slate-400 italic">
-            Select a day to view symptoms
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

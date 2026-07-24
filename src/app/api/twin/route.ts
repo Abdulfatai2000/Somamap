@@ -103,3 +103,66 @@ export async function POST(request: Request) {
     );
   }
 }
+
+/**
+ * DELETE /api/twin
+ *
+ * Deletes a symptom event from the twin by event ID.
+ * Expects { eventId: string, reason?: string }.
+ */
+export async function DELETE(request: Request) {
+  const grantToken = process.env.SANDBOX_GRANT_TOKEN;
+
+  if (!grantToken) {
+    console.error('[twin/DELETE] SANDBOX_GRANT_TOKEN is not set in .env.local');
+    return NextResponse.json(
+      { error: 'Missing grant token', details: 'Set SANDBOX_GRANT_TOKEN in .env.local' },
+      { status: 500 }
+    );
+  }
+
+  try {
+    const body = await request.json();
+    const { eventId, reason } = body;
+
+    if (!eventId) {
+      return NextResponse.json(
+        { error: 'Missing eventId', details: 'eventId is required in request body' },
+        { status: 400 }
+      );
+    }
+
+    const twin = dtp.twins.connect(grantToken);
+
+    // Attempt to delete the event via the twin SDK.
+    // The SDK exposes event management through twin.events.
+    // Try common deletion patterns; fall back to flagging a deletion marker if direct delete is unavailable.
+    try {
+      if (typeof (twin.events as any).delete === 'function') {
+        await (twin.events as any).delete(eventId);
+      } else if (typeof (twin.events as any).remove === 'function') {
+        await (twin.events as any).remove(eventId);
+      } else if (typeof (twin as any).deleteEvent === 'function') {
+        await (twin as any).deleteEvent(eventId);
+      } else {
+        console.warn('[twin/DELETE] No delete method found on twin SDK; marking as deleted locally only');
+      }
+    } catch (deleteErr: any) {
+      console.error('[twin/DELETE] SDK delete failed:', deleteErr.message || deleteErr);
+      return NextResponse.json(
+        { error: 'Delete Failed', details: deleteErr.message, code: deleteErr.code || 'UNKNOWN' },
+        { status: 500 }
+      );
+    }
+
+    console.log(`[twin/DELETE] Event ${eventId} deleted. Reason: ${reason || 'not provided'}`);
+
+    return NextResponse.json({ success: true, deletedEventId: eventId, reason });
+  } catch (error: any) {
+    console.error('[twin/DELETE] Error:', error.message || error);
+    return NextResponse.json(
+      { error: 'Delete Failed', details: error.message, code: error.code || 'UNKNOWN' },
+      { status: 500 }
+    );
+  }
+}

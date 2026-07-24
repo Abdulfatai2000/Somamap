@@ -54,6 +54,26 @@ export default function Home() {
     fetchTwinEvents(); // Refresh twin events after a submission
   };
 
+  const handleDeleteEvent = async (eventId: string) => {
+    try {
+      const res = await fetch('/api/twin', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        console.error('Delete failed:', data);
+        alert(data.error || 'Failed to delete entry');
+      } else {
+        fetchTwinEvents(); // Refresh list after deletion
+      }
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('Failed to delete entry');
+    }
+  };
+
   // Compute count of logged symptoms per body system for the BodyMap highlight
   const loggedCounts = events.reduce((acc, evt) => {
     const sys = evt.data?.system;
@@ -113,7 +133,7 @@ export default function Home() {
         </div>
 
         {/* Two-column layout: body map + panel */}
-        <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
+        <div className="flex flex-col lg:flex-row gap-8 items-stretch">
           {/* Body Map */}
           <div className="w-full lg:w-auto flex-shrink-0">
             <BodyMap
@@ -125,9 +145,9 @@ export default function Home() {
           </div>
 
           {/* Right panel with view tabs */}
-          <div className="w-full lg:max-w-sm">
+          <div className="w-full lg:max-w-sm flex flex-col min-h-0 lg:self-stretch lg:max-h-[580px]">
             {/* View tabs */}
-            <div className="flex p-1 gap-1 mb-4 bg-slate-100 rounded-2xl">
+            <div className="flex p-1 gap-1 mb-4 bg-slate-100 rounded-2xl flex-shrink-0">
               {tabs.map(tab => (
                 <button
                   key={tab.key}
@@ -143,10 +163,12 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Panel content */}
-            {viewMode === 'patterns' && <PatternPanel events={events} />}
-            {viewMode === 'timeline' && <TimelinePanel events={events} />}
-            {viewMode === 'calendar' && <CalendarPanel events={events} />}
+            {/* Panel content — stretches to match body map height */}
+            <div className="flex-1 min-h-0">
+              {viewMode === 'patterns' && <PatternPanel events={events} />}
+              {viewMode === 'timeline' && <TimelinePanel events={events} onDeleteEvent={handleDeleteEvent} />}
+              {viewMode === 'calendar' && <CalendarPanel events={events} />}
+            </div>
           </div>
         </div>
       </div>

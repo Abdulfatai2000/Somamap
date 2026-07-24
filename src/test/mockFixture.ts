@@ -87,9 +87,19 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     data: { system: 'head', severity: 5, symptomName: 'Throbbing headache' },
   },
 
-  // ── right-shoulder (1 entry) ─────────────────────────────────────────────
+  // ── neck (1 entry) ───────────────────────────────────────────────────────
   {
     id: 'evt-009',
+    twinId: 'twin-demo',
+    eventType: 'symptom_log',
+    occurredAt: daysAgo(10),
+    title: 'Neck stiffness',
+    data: { system: 'neck', severity: 3, symptomName: 'Neck stiffness' },
+  },
+
+  // ── right-shoulder (1 entry) ─────────────────────────────────────────────
+  {
+    id: 'evt-010',
     twinId: 'twin-demo',
     eventType: 'symptom_log',
     occurredAt: daysAgo(5),

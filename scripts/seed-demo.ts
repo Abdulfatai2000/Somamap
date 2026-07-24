@@ -90,6 +90,15 @@ const DEMO_EVENTS = [
     data: { system: 'head', severity: 6, symptomName: 'Throbbing headache' },
   },
 
+  // ── neck (1 entry) ───────────────────────────────────────────────────────
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(10),
+    title: 'Neck stiffness',
+    description: 'After sleeping wrong, tight on the left side.',
+    data: { system: 'neck', severity: 3, symptomName: 'Neck stiffness' },
+  },
+
   // ── right-shoulder (1 entry) ─────────────────────────────────────────────
   {
     eventType: 'symptom' as const,

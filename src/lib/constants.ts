@@ -1,5 +1,6 @@
 export const BODY_SYSTEMS = [
   'head',
+  'neck',
   'chest',
   'abdomen',
   'back',

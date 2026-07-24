@@ -22,11 +22,12 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
   };
 
   const regionsInView = view === 'front'
-    ? (['head', 'chest', 'abdomen', 'waist', 'left-shoulder', 'right-shoulder', 'left-elbow', 'right-elbow', 'left-upper-arm', 'right-upper-arm', 'left-forearm', 'right-forearm', 'left-hand', 'right-hand', 'left-thigh', 'right-thigh', 'left-knee', 'right-knee', 'left-lower-leg', 'right-lower-leg', 'left-foot', 'right-foot'] as BodySystem[])
-    : (['head', 'back', 'waist', 'left-shoulder', 'right-shoulder', 'left-elbow', 'right-elbow', 'left-upper-arm', 'right-upper-arm', 'left-forearm', 'right-forearm', 'left-hand', 'right-hand', 'left-thigh', 'right-thigh', 'left-knee', 'right-knee', 'left-lower-leg', 'right-lower-leg', 'left-foot', 'right-foot'] as BodySystem[]);
+    ? (['head', 'neck', 'chest', 'abdomen', 'waist', 'left-shoulder', 'right-shoulder', 'left-elbow', 'right-elbow', 'left-upper-arm', 'right-upper-arm', 'left-forearm', 'right-forearm', 'left-hand', 'right-hand', 'left-thigh', 'right-thigh', 'left-knee', 'right-knee', 'left-lower-leg', 'right-lower-leg', 'left-foot', 'right-foot'] as BodySystem[])
+    : (['head', 'neck', 'back', 'waist', 'left-shoulder', 'right-shoulder', 'left-elbow', 'right-elbow', 'left-upper-arm', 'right-upper-arm', 'left-forearm', 'right-forearm', 'left-hand', 'right-hand', 'left-thigh', 'right-thigh', 'left-knee', 'right-knee', 'left-lower-leg', 'right-lower-leg', 'left-foot', 'right-foot'] as BodySystem[]);
 
   const labelPositions: Record<string, { x: number; y: number }> = {
     head: { x: 120, y: 50 },
+    neck: { x: 120, y: 88 },
     chest: { x: 120, y: 138 },
     abdomen: { x: 120, y: 230 },
     waist: { x: 120, y: 268 },
@@ -115,7 +116,7 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
           <circle cx="120" cy="50" r="36" {...getRegionProps('head')} />
 
           {/* ── Neck connector ───────────────────────────────────────────── */}
-          <rect x="108" y="84" width="24" height="14" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
+          <rect x="108" y="84" width="24" height="14" {...getRegionProps('neck')} />
 
           {view === 'front' ? (
             <>
@@ -178,7 +179,7 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
           {Object.entries(loggedCounts).map(([region, count]) => {
             if (!count || !regionsInView.includes(region as BodySystem)) return null;
             const pos: Record<string, [number, number]> = {
-              head: [120, 50], chest: [120, 138], abdomen: [120, 220],
+              head: [120, 50], neck: [120, 88], chest: [120, 138], abdomen: [120, 220],
               waist: [120, 268], back: [120, 178], 'right-shoulder': [57, 105], 'left-shoulder': [183, 105],
               'right-elbow': [45, 185], 'left-elbow': [195, 185],
               'right-upper-arm': [57, 140], 'left-upper-arm': [183, 140],

@@ -87,23 +87,23 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     data: { system: 'head', severity: 5, symptomName: 'Throbbing headache' },
   },
 
-  // ── abdomen (1 entry) ─────────────────────────────────────────────────────
+  // ── right-shoulder (1 entry) ─────────────────────────────────────────────
   {
     id: 'evt-009',
     twinId: 'twin-demo',
     eventType: 'symptom_log',
     occurredAt: daysAgo(5),
-    title: 'Stomach cramp',
-    data: { system: 'abdomen', severity: 4, symptomName: 'Stomach cramp' },
+    title: 'Right shoulder stiffness',
+    data: { system: 'right-shoulder', severity: 4, symptomName: 'Shoulder stiffness' },
   },
 
-  // ── left-leg (1 entry) ────────────────────────────────────────────────────
+  // ── left-lower-leg (1 entry) ─────────────────────────────────────────────
   {
     id: 'evt-010',
     twinId: 'twin-demo',
     eventType: 'symptom_log',
     occurredAt: daysAgo(3),
-    title: 'Knee ache after walk',
-    data: { system: 'left-leg', severity: 2, symptomName: 'Knee ache' },
+    title: 'Shin splint',
+    data: { system: 'left-lower-leg', severity: 5, symptomName: 'Shin splint' },
   },
 ];

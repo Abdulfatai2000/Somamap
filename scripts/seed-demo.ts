@@ -90,36 +90,58 @@ const DEMO_EVENTS = [
     data: { system: 'head', severity: 6, symptomName: 'Throbbing headache' },
   },
 
-  // ── left-arm (2 entries) ─────────────────────────────────────────────────
+  // ── right-shoulder (1 entry) ─────────────────────────────────────────────
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(11),
+    title: 'Right shoulder stiffness',
+    description: 'Worst in the morning, improves with movement.',
+    data: { system: 'right-shoulder', severity: 4, symptomName: 'Shoulder stiffness', resolvedConceptId: '57676002', resolvedTerm: 'Joint pain (finding)' },
+  },
+
+  // ── left-forearm (1 entry) ────────────────────────────────────────────────
   {
     eventType: 'symptom' as const,
     occurredAt: daysAgo(9),
     title: 'Left forearm cramp',
     description: 'After long typing session. Muscle felt knotted.',
-    data: { system: 'left-arm', severity: 3, symptomName: 'Forearm cramp', resolvedConceptId: '55300003', resolvedTerm: 'Muscle cramp (finding)' },
-  },
-  {
-    eventType: 'symptom' as const,
-    occurredAt: daysAgo(4),
-    title: 'Left wrist ache',
-    description: 'Dull ache, worse with rotation.',
-    data: { system: 'left-arm', severity: 2, symptomName: 'Wrist ache' },
+    data: { system: 'left-forearm', severity: 3, symptomName: 'Forearm cramp', resolvedConceptId: '55300003', resolvedTerm: 'Muscle cramp (finding)' },
   },
 
-  // ── right-leg (2 entries) ────────────────────────────────────────────────
+  // ── left-hand (1 entry) ──────────────────────────────────────────────────
   {
     eventType: 'symptom' as const,
-    occurredAt: daysAgo(11),
-    title: 'Right calf tightness',
-    description: 'After 5k run. Felt tight for 2 days.',
-    data: { system: 'right-leg', severity: 3, symptomName: 'Calf tightness', resolvedConceptId: '23924001', resolvedTerm: 'Tightness sensation (finding)' },
+    occurredAt: daysAgo(7),
+    title: 'Left wrist tingling',
+    description: 'Numbness in fingers after sleeping on hand.',
+    data: { system: 'left-hand', severity: 2, symptomName: 'Wrist tingling' },
   },
+
+  // ── right-knee (1 entry) ─────────────────────────────────────────────────
   {
     eventType: 'symptom' as const,
     occurredAt: daysAgo(5),
-    title: 'Right knee stiffness',
-    description: 'Worse in the morning, improves after walking.',
-    data: { system: 'right-leg', severity: 4, symptomName: 'Knee stiffness', resolvedConceptId: '57676002', resolvedTerm: 'Joint pain (finding)' },
+    title: 'Right knee clicking',
+    description: 'Painless click when climbing stairs.',
+    data: { system: 'right-knee', severity: 2, symptomName: 'Knee clicking' },
+  },
+
+  // ── left-lower-leg (1 entry) ─────────────────────────────────────────────
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(2),
+    title: 'Left shin splint',
+    description: 'Dull ache along tibia after running.',
+    data: { system: 'left-lower-leg', severity: 5, symptomName: 'Shin splint' },
+  },
+
+  // ── right-foot (1 entry) ─────────────────────────────────────────────────
+  {
+    eventType: 'symptom' as const,
+    occurredAt: daysAgo(1),
+    title: 'Right heel pain',
+    description: 'Worse first thing in the morning.',
+    data: { system: 'right-foot', severity: 6, symptomName: 'Heel pain' },
   },
 ];
 

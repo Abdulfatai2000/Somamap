@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { BodySystem } from '@/lib/constants';
 
 interface BodyMapProps {
@@ -8,15 +8,12 @@ interface BodyMapProps {
   recentSeverityByRegion?: Record<string, { severity: number; occurredAt: string }>;
 }
 
-/**
- * Visual region state:
- *  selected  → indigo-500 fill, indigo-600 stroke
- *  has logs  → color-coded by most recent severity:
- *               low (1-3): amber, medium (4-6): orange, high (7-10): red
- *  default   → slate-50 fill, slate-200 stroke (always visible, not relying on hover alone)
- */
+const HOVER_FILL = '#e0e7ff';
+const HOVER_STROKE = '#6366f1';
+
 export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, recentSeverityByRegion = {} }: BodyMapProps) {
   const [view, setView] = useState<'front' | 'back'>('front');
+  const [hoveredRegion, setHoveredRegion] = useState<BodySystem | null>(null);
 
   const getSeverityColor = (severity: number): { fill: string; stroke: string } => {
     if (severity <= 3) return { fill: '#fef3c7', stroke: '#f59e0b' };
@@ -25,17 +22,42 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
   };
 
   const regionsInView = view === 'front'
-    ? (['head', 'chest', 'abdomen', 'left-arm', 'right-arm', 'left-leg', 'right-leg'] as BodySystem[])
-    : (['head', 'back', 'left-arm', 'right-arm', 'left-leg', 'right-leg'] as BodySystem[]);
+    ? (['head', 'chest', 'abdomen', 'left-shoulder', 'right-shoulder', 'left-upper-arm', 'right-upper-arm', 'left-forearm', 'right-forearm', 'left-hand', 'right-hand', 'left-thigh', 'right-thigh', 'left-lower-leg', 'right-lower-leg', 'left-knee', 'right-knee', 'left-foot', 'right-foot'] as BodySystem[])
+    : (['head', 'back', 'left-shoulder', 'right-shoulder', 'left-upper-arm', 'right-upper-arm', 'left-forearm', 'right-forearm', 'left-hand', 'right-hand', 'left-thigh', 'right-thigh', 'left-lower-leg', 'right-lower-leg', 'left-knee', 'right-knee', 'left-foot', 'right-foot'] as BodySystem[]);
+
+  const labelPositions: Record<string, { x: number; y: number }> = {
+    head: { x: 120, y: 50 },
+    chest: { x: 120, y: 138 },
+    abdomen: { x: 120, y: 220 },
+    back: { x: 120, y: 178 },
+    'right-shoulder': { x: 68, y: 110 },
+    'left-shoulder': { x: 172, y: 110 },
+    'right-upper-arm': { x: 65, y: 155 },
+    'left-upper-arm': { x: 175, y: 155 },
+    'right-forearm': { x: 65, y: 210 },
+    'left-forearm': { x: 175, y: 210 },
+    'right-hand': { x: 60, y: 255 },
+    'left-hand': { x: 180, y: 255 },
+    'right-thigh': { x: 98, y: 320 },
+    'left-thigh': { x: 142, y: 320 },
+    'right-knee': { x: 98, y: 368 },
+    'left-knee': { x: 142, y: 368 },
+    'right-lower-leg': { x: 98, y: 415 },
+    'left-lower-leg': { x: 142, y: 415 },
+    'right-foot': { x: 95, y: 452 },
+    'left-foot': { x: 145, y: 452 },
+  };
 
   const getRegionProps = (region: BodySystem) => {
     const isActive = selectedRegion === region;
     const hasLogs = (loggedCounts[region] || 0) > 0;
     const count = loggedCounts[region] || 0;
     const recent = recentSeverityByRegion[region];
+    const isHovered = hoveredRegion === region;
 
     let fill: string, stroke: string;
     if (isActive)    { fill = '#6366f1'; stroke = '#4f46e5'; }
+    else if (isHovered) { fill = HOVER_FILL; stroke = HOVER_STROKE; }
     else if (hasLogs && recent) {
       const sevColor = getSeverityColor(recent.severity);
       fill = sevColor.fill;
@@ -47,9 +69,11 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
     return {
       fill,
       stroke,
-      strokeWidth: isActive ? 2.5 : 1.5,
-      style: { cursor: 'pointer', transition: 'fill 0.18s, stroke 0.18s' } as React.CSSProperties,
+      strokeWidth: isActive ? 2.5 : isHovered ? 2.2 : 1.5,
+      style: { cursor: 'pointer', transition: 'fill 0.15s, stroke 0.15s' } as React.CSSProperties,
       onClick: () => onRegionSelect(region),
+      onMouseEnter: useCallback(() => setHoveredRegion(region), [region]),
+      onMouseLeave: useCallback(() => setHoveredRegion(null), []),
       'aria-label': `${region}${count ? ` (${count} log${count > 1 ? 's' : ''})` : ''} — tap to log symptom`,
     };
   };
@@ -102,28 +126,60 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
             <path d="M 82 98 L 158 98 L 143 262 L 97 262 Z" {...getRegionProps('back')} />
           )}
 
+          {/* ── Shoulders ────────────────────────────────────────────────── */}
+          {/* Patient's right shoulder (screen left) */}
+          <path d="M 82 98 L 55 98 L 60 130 L 82 120 Z" {...getRegionProps('right-shoulder')} />
+          {/* Patient's left shoulder (screen right) */}
+          <path d="M 158 98 L 185 98 L 180 130 L 158 120 Z" {...getRegionProps('left-shoulder')} />
+
           {/* ── Arms ─────────────────────────────────────────────────────── */}
-          {/* Patient's right arm (screen left) */}
-          <path d="M 82 98 L 42 228 L 60 228 L 88 148 Z" {...getRegionProps('right-arm')} />
-          {/* Patient's left arm (screen right) */}
-          <path d="M 158 98 L 198 228 L 180 228 L 152 148 Z" {...getRegionProps('left-arm')} />
+          {/* Patient's right upper arm (screen left) */}
+          <path d="M 82 120 L 60 130 L 42 228 L 60 228 L 88 148 Z" {...getRegionProps('right-upper-arm')} />
+          {/* Patient's right forearm (screen left) */}
+          <path d="M 88 148 L 60 228 L 42 228 L 44 244 L 60 244 L 92 165 Z" {...getRegionProps('right-forearm')} />
+          {/* Patient's right hand (screen left) */}
+          <path d="M 44 244 L 60 244 L 58 260 L 42 260 Z" {...getRegionProps('right-hand')} />
+          {/* Patient's left upper arm (screen right) */}
+          <path d="M 158 120 L 180 130 L 198 228 L 180 228 L 152 148 Z" {...getRegionProps('left-upper-arm')} />
+          {/* Patient's left forearm (screen right) */}
+          <path d="M 152 148 L 180 228 L 198 228 L 196 244 L 180 244 L 148 165 Z" {...getRegionProps('left-forearm')} />
+          {/* Patient's left hand (screen right) */}
+          <path d="M 196 244 L 180 244 L 182 260 L 198 260 Z" {...getRegionProps('left-hand')} />
 
           {/* ── Hips connector ───────────────────────────────────────────── */}
           <path d="M 97 262 L 143 262 L 148 282 L 92 282 Z" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
 
           {/* ── Legs ─────────────────────────────────────────────────────── */}
-          {/* Patient's right leg (screen left) */}
-          <path d="M 92 282 L 76 444 L 110 444 L 118 282 Z" {...getRegionProps('right-leg')} />
-          {/* Patient's left leg (screen right) */}
-          <path d="M 148 282 L 164 444 L 130 444 L 122 282 Z" {...getRegionProps('left-leg')} />
+          {/* Patient's right thigh (screen left) */}
+          <path d="M 92 282 L 84 362 L 114 362 L 118 282 Z" {...getRegionProps('right-thigh')} />
+          {/* Patient's right knee (screen left) */}
+          <path d="M 84 362 L 114 362 L 112 378 L 86 378 Z" {...getRegionProps('right-knee')} />
+          {/* Patient's right lower-leg (screen left) */}
+          <path d="M 86 378 L 112 378 L 110 444 L 76 444 Z" {...getRegionProps('right-lower-leg')} />
+          {/* Patient's right foot (screen left) */}
+          <path d="M 76 444 L 110 444 L 108 460 L 78 460 Z" {...getRegionProps('right-foot')} />
+          {/* Patient's left thigh (screen right) */}
+          <path d="M 148 282 L 156 362 L 126 362 L 122 282 Z" {...getRegionProps('left-thigh')} />
+          {/* Patient's left knee (screen right) */}
+          <path d="M 156 362 L 126 362 L 124 378 L 154 378 Z" {...getRegionProps('left-knee')} />
+          {/* Patient's left lower-leg (screen right) */}
+          <path d="M 154 378 L 124 378 L 130 444 L 164 444 Z" {...getRegionProps('left-lower-leg')} />
+          {/* Patient's left foot (screen right) */}
+          <path d="M 164 444 L 130 444 L 132 460 L 162 460 Z" {...getRegionProps('left-foot')} />
 
           {/* ── Log count badges ─────────────────────────────────────────── */}
           {Object.entries(loggedCounts).map(([region, count]) => {
             if (!count || !regionsInView.includes(region as BodySystem)) return null;
             const pos: Record<string, [number, number]> = {
               head: [120, 50], chest: [120, 138], abdomen: [120, 220],
-              back: [120, 178], 'right-arm': [57, 168], 'left-arm': [183, 168],
-              'right-leg': [95, 360], 'left-leg': [145, 360],
+              back: [120, 178], 'right-shoulder': [57, 105], 'left-shoulder': [183, 105],
+              'right-upper-arm': [57, 140], 'left-upper-arm': [183, 140],
+              'right-forearm': [57, 195], 'left-forearm': [183, 195],
+              'right-hand': [50, 250], 'left-hand': [190, 250],
+              'right-thigh': [95, 320], 'left-thigh': [145, 320],
+              'right-knee': [95, 368], 'left-knee': [145, 368],
+              'right-lower-leg': [95, 410], 'left-lower-leg': [145, 410],
+              'right-foot': [90, 452], 'left-foot': [150, 452],
             };
             const [cx, cy] = pos[region] ?? [0, 0];
             if (!cx) return null;
@@ -136,6 +192,21 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
               </g>
             );
           })}
+
+          {/* ── Hover label ─────────────────────────────────────────────── */}
+          {hoveredRegion && (() => {
+            const pos = labelPositions[hoveredRegion];
+            if (!pos) return null;
+            const label = hoveredRegion.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            return (
+              <g style={{ pointerEvents: 'none' }}>
+                <rect x={pos.x - 36} y={pos.y - 28} width="72" height="18" rx="4" fill="#1e293b" opacity="0.92" />
+                <text x={pos.x} y={pos.y - 15} textAnchor="middle" fill="white" fontSize="9" fontWeight="600">
+                  {label}
+                </text>
+              </g>
+            );
+          })()}
         </svg>
       </div>
 

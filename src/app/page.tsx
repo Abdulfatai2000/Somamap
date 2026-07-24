@@ -4,21 +4,32 @@ import React, { useState, useEffect } from 'react';
 import { BodyMap } from '@/components/BodyMap';
 import { SymptomForm } from '@/components/SymptomForm';
 import { PatternPanel } from '@/components/PatternPanel';
+import { TimelinePanel } from '@/components/TimelinePanel';
+import { CalendarPanel } from '@/components/CalendarPanel';
 import { BodySystem } from '@/lib/constants';
 import type { SymptomEvent } from '@/lib/types';
+
+type ViewMode = 'patterns' | 'timeline' | 'calendar';
 
 export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<BodySystem | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [events, setEvents] = useState<SymptomEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<ViewMode>('patterns');
 
   const fetchTwinEvents = async () => {
     try {
       const res = await fetch('/api/twin');
       const data = await res.json();
       if (res.ok && Array.isArray(data.events)) {
-        const symptoms = data.events.filter((e: any) => e.eventType === 'symptom');
+        const symptoms = data.events.filter((e: any) => {
+          if (e.eventType !== 'symptom') return false;
+          const sys = e.data?.system;
+          const sev = e.data?.severity;
+          if (!sys || typeof sev !== 'number') return false;
+          return true;
+        });
         setEvents(symptoms);
       }
     } catch (err) {
@@ -65,6 +76,12 @@ export default function Home() {
     return acc;
   }, {} as Record<string, { severity: number; occurredAt: string }>);
 
+  const tabs: { key: ViewMode; label: string }[] = [
+    { key: 'patterns', label: 'Patterns' },
+    { key: 'timeline', label: 'Timeline' },
+    { key: 'calendar', label: 'Calendar' },
+  ];
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100">
       {/* Header */}
@@ -95,7 +112,7 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Two-column layout: body map + pattern panel */}
+        {/* Two-column layout: body map + panel */}
         <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
           {/* Body Map */}
           <div className="w-full lg:w-auto flex-shrink-0">
@@ -107,9 +124,29 @@ export default function Home() {
             />
           </div>
 
-          {/* Pattern Panel */}
+          {/* Right panel with view tabs */}
           <div className="w-full lg:max-w-sm">
-            <PatternPanel events={events} />
+            {/* View tabs */}
+            <div className="flex p-1 gap-1 mb-4 bg-slate-100 rounded-2xl">
+              {tabs.map(tab => (
+                <button
+                  key={tab.key}
+                  onClick={() => setViewMode(tab.key)}
+                  className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                    viewMode === tab.key
+                      ? 'bg-white text-indigo-700 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Panel content */}
+            {viewMode === 'patterns' && <PatternPanel events={events} />}
+            {viewMode === 'timeline' && <TimelinePanel events={events} />}
+            {viewMode === 'calendar' && <CalendarPanel events={events} />}
           </div>
         </div>
       </div>

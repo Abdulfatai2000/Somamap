@@ -20,9 +20,12 @@ const formatDate = (iso: string): string => {
 };
 
 const ALL_REGIONS = [
-  'head', 'chest', 'abdomen', 'back',
+  'head', 'chest', 'abdomen', 'back', 'waist',
+  'left-shoulder', 'right-shoulder', 'left-elbow', 'right-elbow',
   'left-upper-arm', 'right-upper-arm', 'left-forearm', 'right-forearm',
-  'left-thigh', 'right-thigh', 'left-lower-leg', 'right-lower-leg'
+  'left-hand', 'right-hand',
+  'left-thigh', 'right-thigh', 'left-knee', 'right-knee',
+  'left-lower-leg', 'right-lower-leg', 'left-foot', 'right-foot'
 ] as const;
 
 export function TimelinePanel({ events }: TimelinePanelProps) {

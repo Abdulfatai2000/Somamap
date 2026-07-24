@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { BodySystem } from '@/lib/constants';
 
 interface BodyMapProps {
@@ -75,8 +75,8 @@ export function BodyMap({ onRegionSelect, selectedRegion, loggedCounts = {}, rec
       strokeWidth: isActive ? 2.5 : isHovered ? 2.2 : 1.5,
       style: { cursor: 'pointer', transition: 'fill 0.15s, stroke 0.15s' } as React.CSSProperties,
       onClick: () => onRegionSelect(region),
-      onMouseEnter: useCallback(() => setHoveredRegion(region), [region]),
-      onMouseLeave: useCallback(() => setHoveredRegion(null), []),
+      onMouseEnter: () => setHoveredRegion(region),
+      onMouseLeave: () => setHoveredRegion(null),
       'aria-label': `${region}${count ? ` (${count} log${count > 1 ? 's' : ''})` : ''} — tap to log symptom`,
     };
   };

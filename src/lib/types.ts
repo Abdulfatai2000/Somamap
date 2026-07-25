@@ -18,6 +18,8 @@ export interface SymptomEvent {
     // HOLON-resolved fields (optional — only present if user accepted suggestion)
     resolvedConceptId?: string;
     resolvedTerm?: string;
+    // Trigger/activity context (optional)
+    trigger?: string;       // What was the user doing before? e.g. "Exercise", "Sitting", etc.
   };
 }
 

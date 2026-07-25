@@ -5,11 +5,12 @@ import { BodyMap } from '@/components/BodyMap';
 import { SymptomForm } from '@/components/SymptomForm';
 import { PatternPanel } from '@/components/PatternPanel';
 import { TimelinePanel } from '@/components/TimelinePanel';
+import { ChartsPanel } from '@/components/ChartsPanel';
 import { CalendarPanel } from '@/components/CalendarPanel';
 import { BodySystem } from '@/lib/constants';
 import type { SymptomEvent } from '@/lib/types';
 
-type ViewMode = 'patterns' | 'timeline';
+type ViewMode = 'patterns' | 'timeline' | 'charts';
 
 export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState<BodySystem | null>(null);
@@ -87,6 +88,7 @@ export default function Home() {
   const tabs: { key: ViewMode; label: string }[] = [
     { key: 'patterns', label: 'Patterns' },
     { key: 'timeline', label: 'Timeline' },
+    { key: 'charts', label: 'Charts' },
   ];
 
   return (
@@ -166,7 +168,8 @@ export default function Home() {
             {/* Panel content — stretches to match body map height */}
             <div className="flex-1 min-h-0">
               {viewMode === 'patterns' && <PatternPanel events={eventsForBodyMap} />}
-              {viewMode === 'timeline' && <TimelinePanel events={events} selectedDate={selectedDate} onDateSelect={setSelectedDate} onDeleteEvent={(id) => setEvents(prev => prev.filter(e => e.id !== id))} />}
+               {viewMode === 'timeline' && <TimelinePanel events={events} selectedDate={selectedDate} onDateSelect={setSelectedDate} />}
+               {viewMode === 'charts' && <ChartsPanel events={eventsForBodyMap} />}
             </div>
           </div>
         </div>

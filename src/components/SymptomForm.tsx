@@ -15,6 +15,8 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
   const [symptomType, setSymptomType] = useState('pain');
   const [severity, setSeverity] = useState<number>(5);
   const [notes, setNotes] = useState('');
+  const [trigger, setTrigger] = useState('');
+  const [triggerOther, setTriggerOther] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -113,6 +115,10 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
         ...(acceptedConcept && {
           resolvedConceptId: acceptedConcept.conceptId,
           resolvedTerm: acceptedConcept.term,
+        }),
+        // Trigger/activity — only include if user selected something
+        ...(trigger && {
+          trigger: trigger === 'Other' ? triggerOther : trigger,
         }),
       },
     };
@@ -277,6 +283,38 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
               placeholder="When did it start? What makes it better or worse?"
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
             />
+          </div>
+
+          {/* ── Trigger/Activity ─────────────────────────────────────── */}
+          <div className="space-y-2">
+            <label htmlFor="trigger" className="block text-sm font-medium text-slate-700">
+              What happened before? <span className="text-slate-400 font-normal">(Optional)</span>
+            </label>
+            <select
+              id="trigger"
+              value={trigger}
+              onChange={(e) => setTrigger(e.target.value)}
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+            >
+              <option value="">— Select activity —</option>
+              <option value="Sitting">Sitting</option>
+              <option value="Exercise">Exercise</option>
+              <option value="Sleep">Sleep</option>
+              <option value="Eating">Eating</option>
+              <option value="Stress">Stress</option>
+              <option value="Not sure">Not sure</option>
+              <option value="Other">Other (describe below)</option>
+            </select>
+            {/* Free text input for "Other" */}
+            {trigger === 'Other' && (
+              <input
+                type="text"
+                value={triggerOther}
+                onChange={(e) => setTriggerOther(e.target.value)}
+                placeholder="What were you doing?"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+              />
+            )}
           </div>
 
           {/* ── Submit ───────────────────────────────────────────────── */}

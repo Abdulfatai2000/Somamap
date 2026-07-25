@@ -277,12 +277,7 @@ export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePa
                             <span className="text-[11px] font-semibold text-slate-300">
                               severity {evt.data?.severity ?? '—'}
                             </span>
-                            {evt.data?.duration && (
-                              <span className="text-[11px] text-slate-400">
-                                • {evt.data.duration}
-                              </span>
-                            )}
-                            {evt.data?.trigger && (
+                             {evt.data?.trigger && (
                               <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/20">
                                 After: {evt.data.trigger}
                               </span>

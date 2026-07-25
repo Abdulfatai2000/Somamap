@@ -26,7 +26,7 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(28),
     title: 'Tight chest',
-    data: { system: 'chest', severity: 4, symptomName: 'Tight chest' },
+    data: { system: 'chest', severity: 4, symptomName: 'Tight chest', symptomType: 'pain' },
   },
   {
     id: 'evt-002',
@@ -34,7 +34,7 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(21),
     title: 'Chest discomfort',
-    data: { system: 'chest', severity: 5, symptomName: 'Chest discomfort', resolvedConceptId: '29857009', resolvedTerm: 'Chest pain (finding)' },
+    data: { system: 'chest', severity: 5, symptomName: 'Chest discomfort', symptomType: 'pain', resolvedConceptId: '29857009', resolvedTerm: 'Chest pain (finding)' },
   },
   {
     id: 'evt-003',
@@ -42,7 +42,7 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(14),
     title: 'Chest tightness',
-    data: { system: 'chest', severity: 6, symptomName: 'Chest tightness', resolvedConceptId: '29857009', resolvedTerm: 'Chest pain (finding)' },
+    data: { system: 'chest', severity: 6, symptomName: 'Chest tightness', symptomType: 'pain', resolvedConceptId: '29857009', resolvedTerm: 'Chest pain (finding)' },
   },
   {
     id: 'evt-004',
@@ -50,7 +50,7 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(7),
     title: 'Sharp chest pain',
-    data: { system: 'chest', severity: 7, symptomName: 'Sharp chest pain' },
+    data: { system: 'chest', severity: 7, symptomName: 'Sharp chest pain', symptomType: 'pain' },
   },
   {
     id: 'evt-005',
@@ -58,7 +58,7 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(1),
     title: 'Chest pressure',
-    data: { system: 'chest', severity: 8, symptomName: 'Chest pressure' },
+    data: { system: 'chest', severity: 8, symptomName: 'Chest pressure', symptomType: 'pain' },
   },
 
   // ── head (3 entries — second-most frequent) ───────────────────────────────
@@ -68,7 +68,7 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(20),
     title: 'Headache',
-    data: { system: 'head', severity: 3, symptomName: 'Headache', resolvedConceptId: '25064002', resolvedTerm: 'Headache (finding)' },
+    data: { system: 'head', severity: 3, symptomName: 'Headache', symptomType: 'pain', resolvedConceptId: '25064002', resolvedTerm: 'Headache (finding)' },
   },
   {
     id: 'evt-007',
@@ -76,7 +76,7 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(10),
     title: 'Migraine aura',
-    data: { system: 'head', severity: 6, symptomName: 'Migraine aura' },
+    data: { system: 'head', severity: 6, symptomName: 'Migraine aura', symptomType: 'pain' },
   },
   {
     id: 'evt-008',
@@ -84,7 +84,7 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(2),
     title: 'Throbbing headache',
-    data: { system: 'head', severity: 5, symptomName: 'Throbbing headache' },
+    data: { system: 'head', severity: 5, symptomName: 'Throbbing headache', symptomType: 'pain' },
   },
 
   // ── neck (1 entry) ───────────────────────────────────────────────────────
@@ -94,7 +94,7 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(10),
     title: 'Neck stiffness',
-    data: { system: 'neck', severity: 3, symptomName: 'Neck stiffness' },
+    data: { system: 'neck', severity: 3, symptomName: 'Neck stiffness', symptomType: 'pain' },
   },
 
   // ── right-shoulder (1 entry) ─────────────────────────────────────────────
@@ -104,7 +104,7 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(5),
     title: 'Right shoulder stiffness',
-    data: { system: 'right-shoulder', severity: 4, symptomName: 'Shoulder stiffness' },
+    data: { system: 'right-shoulder', severity: 4, symptomName: 'Shoulder stiffness', symptomType: 'pain' },
   },
 
   // ── right-elbow (1 entry) ────────────────────────────────────────────────
@@ -114,7 +114,7 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(3),
     title: 'Right elbow soreness',
-    data: { system: 'right-elbow', severity: 3, symptomName: 'Elbow soreness' },
+    data: { system: 'right-elbow', severity: 3, symptomName: 'Elbow soreness', symptomType: 'pain' },
   },
 
   // ── waist (1 entry) ─────────────────────────────────────────────────────
@@ -124,6 +124,6 @@ export const MOCK_EVENTS: SymptomEvent[] = [
     eventType: 'symptom_log',
     occurredAt: daysAgo(1),
     title: 'Lower back stiffness',
-    data: { system: 'waist', severity: 4, symptomName: 'Lower back stiffness' },
+    data: { system: 'waist', severity: 4, symptomName: 'Lower back stiffness', symptomType: 'pain' },
   },
 ];

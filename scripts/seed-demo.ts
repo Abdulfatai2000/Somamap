@@ -174,7 +174,7 @@ const DEMO_EVENTS = [
 
 async function main() {
   console.log('Connecting to twin...');
-  const twin = dtp.twins.connect(GRANT_TOKEN);
+  const twin = dtp.twins.connect(GRANT_TOKEN!);
   console.log(`Connected: ${twin.id}`);
 
   console.log(`Seeding ${DEMO_EVENTS.length} demo events...`);

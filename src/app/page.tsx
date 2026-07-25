@@ -166,7 +166,7 @@ export default function Home() {
             {/* Panel content — stretches to match body map height */}
             <div className="flex-1 min-h-0">
               {viewMode === 'patterns' && <PatternPanel events={eventsForBodyMap} />}
-              {viewMode === 'timeline' && <TimelinePanel events={events} selectedDate={selectedDate} onDateSelect={setSelectedDate} />}
+              {viewMode === 'timeline' && <TimelinePanel events={events} selectedDate={selectedDate} onDateSelect={setSelectedDate} onDeleteEvent={(id) => setEvents(prev => prev.filter(e => e.id !== id))} />}
             </div>
           </div>
         </div>

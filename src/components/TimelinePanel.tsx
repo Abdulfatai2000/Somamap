@@ -8,6 +8,7 @@ interface TimelinePanelProps {
   events: SymptomEvent[];
   selectedDate?: string | null;
   onDateSelect?: (date: string | null) => void;
+  onDeleteEvent?: (eventId: string) => void;
 }
 
 type SortOrder = 'newest' | 'oldest' | 'severity-high' | 'severity-low';
@@ -92,9 +93,11 @@ const getDateLabel = (dateKey: string): string => {
   return date.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
 };
 
-export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePanelProps) {
+export function TimelinePanel({ events, selectedDate, onDateSelect, onDeleteEvent }: TimelinePanelProps) {
   const [regionFilter, setRegionFilter] = useState<string>('all');
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; title: string } | null>(null);
+  const [deleteReason, setDeleteReason] = useState('');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showAllDates, setShowAllDates] = useState(false);
   const sortButtonRef = useRef<HTMLButtonElement>(null);
@@ -142,6 +145,23 @@ export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePa
 
   const visibleDateKeys = showAllDates ? dateKeys : dateKeys.slice(0, 2);
   const hasMoreDates = dateKeys.length > 2;
+
+  const handleDeleteClick = (evt: SymptomEvent) => {
+    setDeleteConfirm({ id: evt.id, title: evt.title || evt.data?.symptomName || 'this entry' });
+    setDeleteReason('');
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deleteConfirm?.id || !onDeleteEvent) return;
+    onDeleteEvent(deleteConfirm.id);
+    setDeleteConfirm(null);
+    setDeleteReason('');
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirm(null);
+    setDeleteReason('');
+  };
 
   const currentSortOption = SORT_OPTIONS.find(o => o.value === sortOrder);
 
@@ -265,6 +285,16 @@ export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePa
                           </p>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <span className="text-[11px] text-slate-400">{formatDateTime(evt.occurredAt)}</span>
+                            <button
+                              onClick={() => handleDeleteClick(evt)}
+                              className="text-red-400 hover:text-red-600 transition-colors"
+                              title="Delete entry"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                              </svg>
+                            </button>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 mt-1">
@@ -299,6 +329,45 @@ export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePa
           </button>
         )}
       </div>
+
+      {/* Delete confirmation modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-base font-bold text-slate-800 mb-2">Delete entry?</h3>
+            <p className="text-sm text-slate-600 mb-4">
+              Are you sure you want to delete <strong>{deleteConfirm.title}</strong>? This action cannot be undone.
+            </p>
+            <div className="mb-4">
+              <label htmlFor="delete-reason" className="block text-xs font-medium text-slate-500 mb-1">
+                Reason (optional)
+              </label>
+              <textarea
+                id="delete-reason"
+                value={deleteReason}
+                onChange={(e) => setDeleteReason(e.target.value)}
+                placeholder="e.g. entered by mistake, duplicate..."
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all resize-none"
+                rows={2}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={handleCancelDelete}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

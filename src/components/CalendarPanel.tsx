@@ -159,12 +159,15 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
           <line x1="8" y1="2" x2="8" y2="6" />
           <line x1="3" y1="10" x2="21" y2="10" />
         </svg>
-        <span>Days</span>
-        {selectedDate && (
-          <span className="ml-1 text-[10px] font-medium text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-full">
-            Selected
-          </span>
-        )}
+        <span>
+          {selectedDate
+            ? (isToday(selectedDate) ? 'Today' : (() => {
+                const [year, month, day] = selectedDate.split('-').map(Number);
+                const d = new Date(year, month - 1, day);
+                return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+              })())
+            : 'Days'}
+        </span>
       </button>
 
       {/* Dropdown popover */}

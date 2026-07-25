@@ -113,28 +113,31 @@ export function ChartsPanel({ events }: ChartsPanelProps) {
 
   const tooltipStyle = {
     borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+    border: '1px solid rgba(255,255,255,0.12)',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+    background: 'rgba(15, 23, 42, 0.92)',
+    backdropFilter: 'blur(12px)',
+    color: '#f8fafc',
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 glass rounded-2xl border border-white/10 p-5 animate-fade-in-up">
       <div>
-        <h4 className="text-sm font-semibold text-slate-700 mb-3">Severity over time</h4>
+        <h4 className="text-sm font-semibold text-slate-200 mb-3">Severity over time</h4>
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={lineData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
             <XAxis
               dataKey="date"
               tick={{ fontSize: 11, fill: '#94a3b8' }}
               tickLine={false}
-              axisLine={{ stroke: '#e2e8f0' }}
+              axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
             />
             <YAxis
               domain={[1, 10]}
               tick={{ fontSize: 11, fill: '#94a3b8' }}
               tickLine={false}
-              axisLine={{ stroke: '#e2e8f0' }}
+              axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
             />
             <Tooltip contentStyle={tooltipStyle} />
             {groups.map(group => (
@@ -154,21 +157,21 @@ export function ChartsPanel({ events }: ChartsPanelProps) {
       </div>
 
       <div>
-        <h4 className="text-sm font-semibold text-slate-700 mb-3">Occurrences</h4>
+        <h4 className="text-sm font-semibold text-slate-200 mb-3">Occurrences</h4>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={barData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
             <XAxis
               dataKey="name"
               tick={{ fontSize: 11, fill: '#94a3b8' }}
               tickLine={false}
-              axisLine={{ stroke: '#e2e8f0' }}
+              axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
             />
             <YAxis
               allowDecimals={false}
               tick={{ fontSize: 11, fill: '#94a3b8' }}
               tickLine={false}
-              axisLine={{ stroke: '#e2e8f0' }}
+              axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
             />
             <Tooltip contentStyle={tooltipStyle} />
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>
@@ -180,14 +183,14 @@ export function ChartsPanel({ events }: ChartsPanelProps) {
         </ResponsiveContainer>
       </div>
 
-      <div className="flex flex-wrap gap-3 pt-2 border-t border-slate-100">
+      <div className="flex flex-wrap gap-3 pt-2 border-t border-white/8">
         {groups.map(group => (
           <div key={group} className="flex items-center gap-1.5">
             <span
               className="inline-block w-2.5 h-2.5 rounded-full"
               style={{ backgroundColor: colors[group] }}
             />
-            <span className="text-xs text-slate-600">{group}</span>
+            <span className="text-xs text-slate-300">{group}</span>
           </div>
         ))}
       </div>

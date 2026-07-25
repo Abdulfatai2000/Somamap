@@ -19,7 +19,7 @@ function InlineMd({ text }: { text: string }) {
     <>
       {parts.map((part, i) =>
         i % 2 === 1
-          ? <strong key={i} className="font-semibold text-slate-800">{part}</strong>
+          ? <strong key={i} className="font-semibold text-indigo-200">{part}</strong>
           : <span key={i}>{part}</span>
       )}
     </>
@@ -36,15 +36,15 @@ interface InsightCardProps {
 
 function InsightCard({ icon, label, copy, accent, emptyMsg }: InsightCardProps) {
   return (
-    <div className={`flex gap-4 p-4 rounded-2xl border bg-white ${accent}`}>
-      <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-current/10">
+    <div className={`flex gap-4 p-4 rounded-2xl border bg-white/8 backdrop-blur-xl border-white/10 ${accent} animate-fade-in-up`}>
+      <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-indigo-500/30 to-purple-500/30 border border-indigo-400/20">
         {icon}
       </div>
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">{label}</p>
         {copy
-          ? <p className="text-sm text-slate-600 leading-relaxed"><InlineMd text={copy} /></p>
-          : <p className="text-sm text-slate-400 italic">{emptyMsg ?? 'Not enough data yet.'}</p>
+          ? <p className="text-sm text-slate-300 leading-relaxed"><InlineMd text={copy} /></p>
+          : <p className="text-sm text-slate-500 italic">{emptyMsg ?? 'Not enough data yet.'}</p>
         }
       </div>
     </div>
@@ -68,12 +68,12 @@ export function PatternPanel({ events }: PatternPanelProps) {
       {/* Panel header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-base font-bold text-slate-800">Your Patterns</h3>
+          <h3 className="text-base font-bold text-white">Your Patterns</h3>
           <p className="text-xs text-slate-400 mt-0.5">{totalLogs} symptom log{totalLogs !== 1 ? 's' : ''} analysed</p>
         </div>
         {/* Live Twin status badge */}
-        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 shadow-lg shadow-emerald-500/20">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
           Live Twin
         </span>
       </div>
@@ -88,7 +88,7 @@ export function PatternPanel({ events }: PatternPanelProps) {
             </svg>
           }
           copy={frequency}
-          accent="border-indigo-100"
+          accent="border-indigo-500/30"
           emptyMsg="Log at least 2 symptoms to see recurrence patterns."
         />
 
@@ -101,7 +101,7 @@ export function PatternPanel({ events }: PatternPanelProps) {
             </svg>
           }
           copy={mostLogged}
-          accent="border-amber-100"
+          accent="border-amber-500/30"
           emptyMsg="No symptom logs yet."
         />
 
@@ -114,7 +114,7 @@ export function PatternPanel({ events }: PatternPanelProps) {
             </svg>
           }
           copy={trend}
-          accent="border-emerald-100"
+          accent="border-emerald-500/30"
           emptyMsg="Log 3+ symptoms in one region to see a trend."
         />
       </div>

@@ -156,24 +156,24 @@ export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePa
   }, []);
 
   return (
-    <div className="w-full max-w-sm mx-auto flex flex-col h-full">
+    <div className="w-full max-w-sm mx-auto flex flex-col h-full glass rounded-2xl border border-white/10 animate-fade-in-up">
       {/* Panel header */}
-      <div className="flex items-center justify-between mb-4 flex-shrink-0">
+      <div className="flex items-center justify-between mb-4 flex-shrink-0 px-4 pt-4">
         <div>
-          <h3 className="text-base font-bold text-slate-800">Timeline</h3>
+          <h3 className="text-base font-bold text-white">Timeline</h3>
           <p className="text-xs text-slate-400 mt-0.5">{filtered.length} event{filtered.length !== 1 ? 's' : ''}</p>
         </div>
         <div className="relative">
           <button
             ref={sortButtonRef}
             onClick={() => setShowSortDropdown(prev => !prev)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg glass hover:bg-white/15 text-slate-300 hover:text-indigo-300 transition-colors border border-white/10"
             title="Sort options"
           >
             {currentSortOption?.icon}
           </button>
           {showSortDropdown && (
-            <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-xl shadow-lg z-20 py-1" onMouseDown={(e) => e.stopPropagation()}>
+            <div className="absolute right-0 top-full mt-1 w-48 glass-strong rounded-xl shadow-xl z-20 py-1 border border-white/10" onMouseDown={(e) => e.stopPropagation()}>
               {SORT_OPTIONS.map(option => (
                 <button
                   key={option.value}
@@ -183,14 +183,14 @@ export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePa
                   }}
                   className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors ${
                     sortOrder === option.value
-                      ? 'bg-indigo-50 text-indigo-700 font-medium'
-                      : 'text-slate-600 hover:bg-slate-50'
+                      ? 'bg-indigo-500/20 text-indigo-300 font-medium'
+                      : 'text-slate-300 hover:bg-white/10'
                   }`}
                 >
                   <span className="flex-shrink-0">{option.icon}</span>
                   <span className="flex-1 text-left">{option.label}</span>
                   {sortOrder === option.value && (
-                    <span className="text-indigo-500 ml-auto">✓</span>
+                    <span className="text-indigo-400 ml-auto">✓</span>
                   )}
                 </button>
               ))}
@@ -200,11 +200,11 @@ export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePa
       </div>
 
       {/* Region filter */}
-      <div className="mb-4 flex-shrink-0">
+      <div className="mb-4 flex-shrink-0 px-4">
         <select
           value={regionFilter}
           onChange={(e) => setRegionFilter(e.target.value)}
-          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+          className="w-full px-3 py-2 glass rounded-xl text-sm text-slate-200 focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 outline-none transition-all border border-white/10"
         >
           <option value="all">All regions</option>
           {ALL_REGIONS.map(r => (
@@ -214,9 +214,9 @@ export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePa
       </div>
 
       {/* Event list — scrollable, grouped by date */}
-      <div className="flex-1 overflow-y-auto space-y-4 pr-1 min-h-0">
+      <div className="flex-1 overflow-y-auto space-y-4 pr-1 min-h-0 px-4 pb-4">
         {filtered.length === 0 && (
-          <p className="text-sm text-slate-400 italic text-center py-6">No events yet.</p>
+          <p className="text-sm text-slate-500 italic text-center py-6">No events yet.</p>
         )}
         
         {visibleDateKeys.map(dateKey => {
@@ -232,46 +232,49 @@ export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePa
                 onClick={() => onDateSelect?.(isSelected ? null : dateKey)}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${
                   isSelected
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                    ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-400/30'
+                    : 'glass text-slate-300 hover:bg-white/10 border border-white/5'
                 }`}
               >
                 <span>{dateLabel}</span>
                 <div className="flex items-center gap-2">
                   {loggable && (
-                    <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">
+                    <span className="text-[10px] font-medium text-emerald-300 bg-emerald-500/15 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
                       Loggable
                     </span>
                   )}
-                  <span className="text-xs text-slate-400">{dateEvents.length}</span>
+                  <span className="text-xs text-slate-500">{dateEvents.length}</span>
                 </div>
               </button>
-              
+               
               {/* Events for this date — show only if selected or first 2 dates */}
               {(isSelected || !showAllDates) && (
                 <div className="space-y-2 pl-2">
-                  {dateEvents.map(evt => (
-                    <div key={evt.id} className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 bg-white group relative">
-                      <div className="flex-shrink-0 mt-0.5">
-                        <span
-                          className="inline-block w-2.5 h-2.5 rounded-full"
-                          style={{ backgroundColor: severityColor(evt.data?.severity ?? 5) }}
-                        />
-                      </div>
-                        <div className="min-w-0 flex-1">
+                   {dateEvents.map(evt => (
+                     <div key={evt.id} className="flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/5 group relative backdrop-blur-sm animate-fade-in-up hover:bg-white/8 transition-colors">
+                       <div className="flex-shrink-0 mt-1">
+                         <span
+                           className="inline-block w-3 h-3 rounded-full shadow-lg"
+                           style={{ 
+                             backgroundColor: severityColor(evt.data?.severity ?? 5),
+                             boxShadow: `0 0 8px ${severityColor(evt.data?.severity ?? 5)}`
+                           }}
+                         />
+                       </div>
+                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-sm font-medium text-slate-800 truncate">
+                            <p className="text-sm font-semibold text-slate-100 truncate">
                               {evt.data?.symptomName || evt.title}
                             </p>
                             <div className="flex items-center gap-2 flex-shrink-0">
-                              <span className="text-[11px] text-slate-400">{formatDateTime(evt.occurredAt)}</span>
+                              <span className="text-xs font-semibold text-slate-200">{formatDateTime(evt.occurredAt)}</span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 mt-1 flex-wrap">
-                            <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                            <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/20">
                               {evt.data?.system}
                             </span>
-                            <span className="text-[11px] text-slate-400">
+                            <span className="text-[11px] font-semibold text-slate-300">
                               severity {evt.data?.severity ?? '—'}
                             </span>
                             {evt.data?.duration && (
@@ -280,13 +283,13 @@ export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePa
                               </span>
                             )}
                             {evt.data?.trigger && (
-                              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">
+                              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/20">
                                 After: {evt.data.trigger}
                               </span>
                             )}
                           </div>
                           {evt.description && (
-                            <p className="text-xs text-slate-500 mt-1.5 line-clamp-2">
+                            <p className="text-xs text-slate-300 mt-2 line-clamp-2 leading-relaxed">
                               {evt.description}
                             </p>
                           )}
@@ -301,12 +304,14 @@ export function TimelinePanel({ events, selectedDate, onDateSelect }: TimelinePa
 
         {/* See more / Show less */}
         {hasMoreDates && (
-          <button
-            onClick={() => setShowAllDates(prev => !prev)}
-            className="w-full py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
-          >
-            {showAllDates ? 'Show less' : `See more (${dateKeys.length - 2} more dates)`}
-          </button>
+          <div className="px-4 pb-4">
+            <button
+              onClick={() => setShowAllDates(prev => !prev)}
+              className="w-full py-2 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+            >
+              {showAllDates ? 'Show less' : `See more (${dateKeys.length - 2} more dates)`}
+            </button>
+          </div>
         )}
       </div>
 

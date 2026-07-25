@@ -109,10 +109,10 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
             h-8 w-8 mx-auto rounded-lg flex items-center justify-center text-xs font-medium
             transition-all duration-150 relative
             ${isSelected
-              ? 'bg-indigo-600 text-white shadow-sm'
+              ? 'bg-gradient-to-br from-indigo-500 to-indigo-700 text-white shadow-lg shadow-indigo-500/40'
               : hasEvents
-                ? 'bg-white text-slate-700 hover:bg-indigo-50 border border-slate-200'
-                : 'bg-transparent text-slate-400 hover:text-slate-600'
+                ? 'glass text-slate-300 hover:bg-white/15 border border-white/10'
+                : 'text-slate-500 hover:text-slate-300'
             }
           `}
         >
@@ -122,7 +122,10 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
               {dayEvents.length === 1 ? (
                 <span
                   className="w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: severityColor(dayEvents[0].data?.severity ?? 5) }}
+                  style={{ 
+                    backgroundColor: severityColor(dayEvents[0].data?.severity ?? 5),
+                    boxShadow: `0 0 3px ${severityColor(dayEvents[0].data?.severity ?? 5)}`
+                  }}
                 />
               ) : (
                 <span className="flex gap-0.5">
@@ -130,7 +133,10 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
                     <span
                       key={i}
                       className="w-1 h-1 rounded-full"
-                      style={{ backgroundColor: severityColor(evt.data?.severity ?? 5) }}
+                      style={{ 
+                        backgroundColor: severityColor(evt.data?.severity ?? 5),
+                        boxShadow: `0 0 2px ${severityColor(evt.data?.severity ?? 5)}`
+                      }}
                     />
                   ))}
                 </span>
@@ -138,7 +144,7 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
             </span>
           )}
           {loggable && !isSelected && (
-            <span className="absolute -top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500" title="Today" />
+            <span className="absolute -top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50" title="Today" />
           )}
         </button>
       );
@@ -151,7 +157,7 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
       {/* Toggle button */}
       <button
         onClick={() => setIsOpen(prev => !prev)}
-        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors shadow-sm"
+        className="flex items-center gap-2 px-4 py-2 glass rounded-xl text-sm font-medium text-slate-300 hover:bg-white/15 hover:text-indigo-300 transition-colors border border-white/10 shadow-lg"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -172,23 +178,23 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
 
       {/* Dropdown popover */}
       {isOpen && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200 p-4 z-50">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 glass-strong rounded-2xl shadow-2xl border border-white/10 p-4 z-50">
           {/* Month navigation */}
           <div className="flex items-center justify-between mb-3">
             <button
               onClick={goToPrevMonth}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 transition-colors"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </button>
-            <span className="text-sm font-semibold text-slate-700">
+            <span className="text-sm font-semibold text-white">
               {MONTH_NAMES[currentMonth.month]} {currentMonth.year}
             </span>
             <button
               onClick={goToNextMonth}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 transition-colors"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="9 18 15 12 9 6" />
@@ -199,7 +205,7 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
           {/* Day-of-week headers */}
           <div className="grid grid-cols-7 mb-1">
             {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-              <div key={d} className="h-5 flex items-center justify-center text-[10px] font-semibold text-slate-400 uppercase">
+              <div key={d} className="h-5 flex items-center justify-center text-[10px] font-semibold text-slate-500 uppercase">
                 {d}
               </div>
             ))}
@@ -212,16 +218,16 @@ export function CalendarPanel({ events, selectedDate, onDateSelect }: CalendarPa
 
           {/* Selected date indicator */}
           {selectedDate && (
-            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xs text-slate-500">
-                Viewing: <strong className="text-slate-700">{selectedDate}</strong>
+            <div className="mt-3 pt-3 border-t border-white/8 flex items-center justify-between">
+              <span className="text-xs text-slate-400">
+                Viewing: <strong className="text-slate-200">{selectedDate}</strong>
               </span>
               <button
                 onClick={() => {
                   onDateSelect?.(null);
                   setIsOpen(false);
                 }}
-                className="text-[11px] text-indigo-600 hover:text-indigo-700 font-medium"
+                className="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium"
               >
                 Clear filter
               </button>

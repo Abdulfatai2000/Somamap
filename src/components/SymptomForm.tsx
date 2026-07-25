@@ -142,19 +142,19 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+      <div className="glass-strong rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-white/10">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-          <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+        <div className="px-6 py-4 border-b border-white/8 flex justify-between items-center bg-white/5">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             Log Symptom
-            <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-medium uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-medium uppercase tracking-wider border border-indigo-500/30">
               {region}
             </span>
           </h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 transition-colors p-1"
+            className="text-slate-400 hover:text-slate-200 transition-colors p-1"
             aria-label="Close"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -166,14 +166,14 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* ── Symptom Type ───────────────────────────────────────────── */}
           <div className="space-y-2">
-            <label htmlFor="sym-type" className="block text-sm font-medium text-slate-700">
+            <label htmlFor="sym-type" className="block text-sm font-medium text-slate-300">
               Symptom Type
             </label>
             <select
               id="sym-type"
               value={symptomType}
               onChange={(e) => setSymptomType(e.target.value)}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 outline-none transition-all text-slate-200"
             >
               <option value="pain">Pain</option>
               <option value="itch">Itch</option>
@@ -186,8 +186,8 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
 
           {/* ── Symptom Name + HOLON suggestions ─────────────────────── */}
           <div className="space-y-2">
-            <label htmlFor="sym-name" className="block text-sm font-medium text-slate-700">
-              Symptom Name {symptomType === 'other' ? '' : <span className="text-slate-400 font-normal">(Optional)</span>}
+            <label htmlFor="sym-name" className="block text-sm font-medium text-slate-300">
+              Symptom Name {symptomType === 'other' ? '' : <span className="text-slate-500 font-normal">(Optional)</span>}
             </label>
             <div className="relative">
               <input
@@ -199,7 +199,7 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
                 onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                 placeholder={symptomType === 'other' ? 'Describe your symptom...' : 'Optional detail (e.g. sharp, dull, throbbing)...'}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 outline-none transition-all text-white placeholder-slate-500"
                 autoComplete="off"
               />
               {/* Spinner while fetching */}
@@ -213,8 +213,8 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
               )}
               {/* Suggestion dropdown */}
               {showSuggestions && suggestions.length > 0 && (
-                <ul className="absolute z-10 mt-1 w-full bg-white rounded-xl border border-slate-200 shadow-lg overflow-hidden">
-                  <li className="px-3 py-1.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider bg-slate-50 border-b border-slate-100">
+                <ul className="absolute z-10 mt-1 w-full glass-strong rounded-xl border border-white/10 shadow-2xl overflow-hidden">
+                  <li className="px-3 py-1.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider bg-white/5 border-b border-white/8">
                     Clinical terms — tap to accept
                   </li>
                   {suggestions.map((concept) => (
@@ -222,10 +222,10 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
                       <button
                         type="button"
                         onMouseDown={() => handleAcceptConcept(concept)}
-                        className="w-full text-left px-4 py-2.5 hover:bg-indigo-50 transition-colors text-sm"
+                        className="w-full text-left px-4 py-2.5 hover:bg-indigo-500/15 transition-colors text-sm"
                       >
-                        <span className="font-medium text-slate-800">{concept.term}</span>
-                        <span className="ml-2 text-[11px] text-slate-400 font-mono">{concept.conceptId}</span>
+                        <span className="font-medium text-slate-200">{concept.term}</span>
+                        <span className="ml-2 text-[11px] text-slate-500 font-mono">{concept.conceptId}</span>
                       </button>
                     </li>
                   ))}
@@ -234,13 +234,13 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
             </div>
             {/* Accepted concept badge */}
             {acceptedConcept && (
-              <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5">
+              <div className="flex items-center gap-1.5 text-xs text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-1.5">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                 <span>Clinical term accepted: <strong>{acceptedConcept.term}</strong></span>
                 <button
                   type="button"
                   onClick={() => { setAcceptedConcept(null); setName(''); }}
-                  className="ml-auto text-emerald-500 hover:text-emerald-700"
+                  className="ml-auto text-emerald-400 hover:text-emerald-300"
                   aria-label="Clear accepted concept"
                 >×</button>
               </div>
@@ -250,10 +250,10 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
           {/* ── Severity ─────────────────────────────────────────────── */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <label htmlFor="severity" className="block text-sm font-medium text-slate-700">
+              <label htmlFor="severity" className="block text-sm font-medium text-slate-300">
                 Severity
               </label>
-              <span className="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
+              <span className="text-sm font-bold text-indigo-300 bg-indigo-500/15 px-2 py-0.5 rounded-md border border-indigo-500/20">
                 {severity} / 10
               </span>
             </div>
@@ -263,17 +263,17 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
               min="1" max="10"
               value={severity}
               onChange={(e) => setSeverity(Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+              className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-indigo-500"
             />
-            <div className="flex justify-between text-xs font-medium text-slate-400 px-1">
+            <div className="flex justify-between text-xs font-medium text-slate-500 px-1">
               <span>Mild</span><span>Severe</span>
             </div>
           </div>
 
           {/* ── Notes ────────────────────────────────────────────────── */}
           <div className="space-y-2">
-            <label htmlFor="notes" className="block text-sm font-medium text-slate-700">
-              Additional Notes <span className="text-slate-400 font-normal">(Optional)</span>
+            <label htmlFor="notes" className="block text-sm font-medium text-slate-300">
+              Additional Notes <span className="text-slate-500 font-normal">(Optional)</span>
             </label>
             <textarea
               id="notes"
@@ -281,20 +281,20 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="When did it start? What makes it better or worse?"
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 outline-none transition-all resize-none text-white placeholder-slate-500"
             />
           </div>
 
           {/* ── Trigger/Activity ─────────────────────────────────────── */}
           <div className="space-y-2">
-            <label htmlFor="trigger" className="block text-sm font-medium text-slate-700">
-              What happened before? <span className="text-slate-400 font-normal">(Optional)</span>
+            <label htmlFor="trigger" className="block text-sm font-medium text-slate-300">
+              What happened before? <span className="text-slate-500 font-normal">(Optional)</span>
             </label>
             <select
               id="trigger"
               value={trigger}
               onChange={(e) => setTrigger(e.target.value)}
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+              className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 outline-none transition-all text-slate-200"
             >
               <option value="">— Select activity —</option>
               <option value="Sitting">Sitting</option>
@@ -312,7 +312,7 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
                 value={triggerOther}
                 onChange={(e) => setTriggerOther(e.target.value)}
                 placeholder="What were you doing?"
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 outline-none transition-all text-white placeholder-slate-500"
               />
             )}
           </div>
@@ -320,17 +320,17 @@ export function SymptomForm({ region, onClose, selectedDate }: SymptomFormProps)
           {/* ── Submit ───────────────────────────────────────────────── */}
           <div className="pt-2 space-y-3">
             {errorMsg && (
-              <div className="text-red-500 text-sm font-medium text-center" role="alert">
+              <div className="text-red-400 text-sm font-medium text-center" role="alert">
                 {errorMsg}
               </div>
             )}
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-3 px-4 text-white rounded-xl font-medium shadow-sm transition-all ${
+              className={`w-full py-3 px-4 text-white rounded-xl font-medium shadow-lg transition-all ${
                 isSubmitting
-                  ? 'bg-indigo-400 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200 active:scale-[0.98]'
+                  ? 'bg-indigo-500/40 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 shadow-indigo-500/30 active:scale-[0.98]'
               }`}
             >
               {isSubmitting ? 'Saving...' : 'Save Symptom Log'}

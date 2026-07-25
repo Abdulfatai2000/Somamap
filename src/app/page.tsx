@@ -32,7 +32,7 @@ const comparisonRight = [
   ['DURATION', '3 hours'],
   ['TRIGGER', 'Lack of sleep'],
   ['WHEN', 'Monday'],
-  ['TWIN', 'Structured event'],
+  ['TWIN', 'Structured event']
 ];
 
 const roadmap = [
